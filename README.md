@@ -8,6 +8,7 @@ The Node RED Barcode Processing Platform
  - DOTNET 9.0 (With Maui payloads)
  - xCode 16.4
  - Rider 2025.2.3
+ - MacOS 26
 
 ## License
 MIT License

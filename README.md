@@ -1,7 +1,15 @@
 # Node RED BARRED
 The Node RED Barcode Processing Platform
 
- ## License
+## Native App Build Environment
+
+ - Android DK 15 (35)
+ - Java DK 25
+ - DOTNET 9.0 (With Maui payloads)
+ - xCode 16.4
+ - Rider 2025.2.3
+
+## License
 MIT License
 
 Copyright (c) 2025 Marcus Davies

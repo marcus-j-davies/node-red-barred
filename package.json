@@ -1,0 +1,39 @@
+{
+	"name": "@marcus-j-davies/node-red-barred",
+	"version": "0.0.1",
+	"license": "MIT",
+	"description": "The Node RED Barcode Processing Platform",
+	"keywords": [
+		"node-red",
+		"barcode",
+		"qr",
+		"code"
+	],
+	"dependencies": {
+		"socket.io":"4.8.1"
+	},
+	"engines": {
+		"node": ">=16.0.0"
+	},
+	"node-red": {
+		"version": ">=2.0.0",
+		"nodes": {
+			"semaphore-plus-take": "nodes/semaphore-plus-take.js",
+			"semaphore-plus-release": "nodes/semaphore-plus-release.js",
+			"semaphore-plus-fs-reset": "nodes/semaphore-plus-fs-reset.js",
+			"semaphore-plus-config": "nodes/semaphore-plus-config.js"
+		}
+	},
+	"bugs": {
+		"url": "https://github.com/marcus-j-davies/node-red-barred/issues"
+	},
+	"homepage": "https://github.com/marcus-j-davies/node-red-barred#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/marcus-j-davies/node-red-barred.git"
+	},
+	"author": {
+		"name": "Marcus Davies",
+		"email": "marcus.davies83@icloud.com"
+	}
+}

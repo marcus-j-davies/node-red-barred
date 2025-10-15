@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Barred_Client.Scanner"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:program="clr-namespace:Barred_Client"
+    xmlns:scanner="clr-namespace:BarcodeScanning;assembly=BarcodeScanning.Native.Maui"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{x:Static program:MauiProgram.ThemeColor}" StatusBarStyle="LightContent" />
+    </ContentPage.Behaviors>
+
+    <Grid
+        Margin="0,5,0,0"
+        Padding="30"
+        RowDefinitions="Auto, Auto, Auto, *, Auto"
+        RowSpacing="25">
+
+        <Grid
+            ColumnDefinitions="*,*"
+            Grid.Row="0"
+            HorizontalOptions="FillAndExpand">
+            <Image
+                Aspect="AspectFit"
+                Grid.Column="0"
+                Source="node_red_icon.png"
+                WidthRequest="60" />
+            <Label
+                FontSize="24"
+                Grid.Column="1"
+                Text="{x:Static program:MauiProgram.Department}"
+                VerticalOptions="Center" />
+        </Grid>
+
+        <Grid
+            ColumnDefinitions="*,*"
+            Grid.Row="1"
+            HorizontalOptions="FillAndExpand">
+            <Label
+                FontAttributes="Bold"
+                FontSize="18"
+                Grid.Column="0"
+                HorizontalOptions="Center"
+                Text="User/Device" />
+            <Label
+                FontSize="18"
+                Grid.Column="1"
+                HorizontalOptions="Center"
+                Text="{x:Static program:MauiProgram.UserLabel}" />
+        </Grid>
+
+        <Border
+            Background="{x:Static program:MauiProgram.ThemeColor}"
+            Grid.Row="2"
+            Stroke="{x:Static program:MauiProgram.ThemeColor}"
+            StrokeThickness="3">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="10" />
+            </Border.StrokeShape>
+            <Border.Shadow>
+                <Shadow
+                    Brush="black"
+                    Offset="5,5"
+                    Opacity="0.8" />
+            </Border.Shadow>
+            <scanner:CameraView
+                BarcodeSymbologies="All"
+                CameraEnabled="True"
+                HeightRequest="150"
+                OnDetectionFinished="ScannerEl_OnOnDetectionFinished"
+                TapToFocusEnabled="True"
+                ViewfinderMode="True"
+                WidthRequest="350"
+                x:Name="ScannerEl" />
+        </Border>
+
+        <Border
+            Background="{x:Static program:MauiProgram.ThemeColor}"
+            Grid.Row="3"
+            HorizontalOptions="FillAndExpand"
+            Stroke="{x:Static program:MauiProgram.ThemeColor}"
+            StrokeThickness="3"
+            VerticalOptions="FillAndExpand">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="10" />
+            </Border.StrokeShape>
+            <Border.Shadow>
+                <Shadow
+                    Brush="black"
+                    Offset="5,5"
+                    Opacity="0.8" />
+            </Border.Shadow>
+            <Editor
+                BackgroundColor="LightGrey"
+                FontSize="16"
+                HorizontalOptions="FillAndExpand"
+                IsReadOnly="True"
+                TextColor="Black"
+                VerticalOptions="FillAndExpand"
+                x:Name="Status" />
+        </Border>
+
+        <Grid
+            ColumnDefinitions="Auto,*,Auto"
+            ColumnSpacing="15"
+            Grid.Row="4">
+            <Button
+                BackgroundColor="{x:Static program:MauiProgram.ThemeColor}"
+                Clicked="Button_OnClicked"
+                FontSize="20"
+                Grid.Column="0"
+                HorizontalOptions="Center"
+                Text="Delete En" />
+            <Label
+                Grid.Column="1"
+                HorizontalOptions="Center"
+                Text="Audio Feedback"
+                VerticalOptions="Center" />
+            <Switch
+                Grid.Column="2"
+                HorizontalOptions="Center"
+                IsToggled="True"
+                OnColor="GreenYellow"
+                ThumbColor="{x:Static program:MauiProgram.ThemeColor}"
+                VerticalOptions="Center"
+                x:Name="AudioSwitch" />
+        </Grid>
+
+    </Grid>
+
+</ContentPage>
+
+<!--
+<Frame
+    BorderColor="Gray"
+    CornerRadius="5"
+    Padding="10"
+    HasShadow="False"
+    BackgroundColor="White"
+    HeightRequest="300"
+    WidthRequest="350">
+
+    <ScrollView>
+        <Label FontFamily="Courier New" LineBreakMode="WordWrap">
+            <Label.FormattedText>
+                <FormattedString>
+                    <Span Text="StackEndpoint: " FontAttributes="Bold" />
+                    <Span Text="https://api.example.com" />
+                    <Span Text="&#10;" />
+
+                    <Span Text="StackVersion: " FontAttributes="Bold" />
+                    <Span Text="0.0.4" />
+                    <Span Text="&#10;" />
+
+                    <Span Text="Department: " FontAttributes="Bold" />
+                    <Span Text="Dave's Lair" />
+                    <Span Text="&#10;" />
+
+                    <Span Text="ClientID: " FontAttributes="Bold" />
+                    <Span Text="abc123" />
+                    <Span Text="&#10;" />
+
+                    <Span Text="ClientLabel: " FontAttributes="Bold" />
+                    <Span Text="Dynamic Dave" />
+                    <Span Text="&#10;" />
+
+                    <Span Text="Theme.Color: " FontAttributes="Bold" />
+                    <Span Text="#06402B" />
+                    <Span Text="&#10;" />
+
+                    <Span Text="Theme.LogoURL: " FontAttributes="Bold" />
+                    <Span Text="https://example.com/logo.png" />
+                </FormattedString>
+            </Label.FormattedText>
+        </Label>
+    </ScrollView>
+</Frame>-->

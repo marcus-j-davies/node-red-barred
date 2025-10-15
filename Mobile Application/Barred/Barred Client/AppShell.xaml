@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    NavBarIsVisible="False"
+    Shell.FlyoutBehavior="Disabled"
+    Title="Barred_Client"
+    x:Class="Barred_Client.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:local="clr-namespace:Barred_Client"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <ShellContent
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="MainPage"
+        Title="Barred Client" />
+</Shell>

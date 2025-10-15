@@ -1,7 +1,7 @@
-# node-red-barred
+# Node RED BARRED
 The Node RED Barcode Processing Platform
 
------
+ ## License
 MIT License
 
 Copyright (c) 2025 Marcus Davies

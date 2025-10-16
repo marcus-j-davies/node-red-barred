@@ -24,9 +24,15 @@ module.exports = function (RED) {
 		};
 
 		const ioOptions = {
-			path: `barred-${self.id}`
+			path: `/barred-${self.id}/`,
+			origin: '*',
+			methods: ['GET', 'POST']
 		};
 		self.io = new Server(RED.server, ioOptions);
+
+		Config.scanners = {
+			'scanner123':'Test'
+		}
 
 		self.io.use((socket, next) => {
 			const { id } = socket.handshake.auth;
@@ -47,8 +53,8 @@ module.exports = function (RED) {
 						timestamp: args.timestmp,
 						item: { ...args.item },
 						scanner: {
-							id: args.scannerId,
-							appVersion: args.appVersion
+							id: args.scanner.scannerId,
+							appVersion: args.scanner.appVersion
 						}
 					}
 				};
@@ -61,11 +67,11 @@ module.exports = function (RED) {
 					_socket: scanner,
 					topic: args.barcode.barcode,
 					payload: {
-						timestamp: args.timestmp,
+						timestamp: args.timestamp,
 						barcode: { ...args.barcode },
 						scanner: {
-							id: args.scannerId,
-							appVersion: args.appVersion
+							id: args.scanner.id,
+							appVersion: args.scanner.appVersion
 						}
 					}
 				};
@@ -79,13 +85,23 @@ module.exports = function (RED) {
 		});
 
 		self.on('close', (_, done) => {
-			self.io.sockets.sockets.forEach((socket) => {
-				socket.disconnect(true);
-			});
+			const ns = `barred-${self.id}`;
+			const namespace = self.io.of(ns);
+
+			if (namespace.sockets) {
+				for (const [id, socket] of namespace.sockets) {
+					socket.disconnect(true);
+				}
+			}
+
 			Object.keys(connectedScanners).forEach((id) => delete connectedScanners[id]);
-			self.io.close(() => {
-				done();
-			});
+			namespace.removeAllListeners();
+
+			if (self.io._nsps && self.io._nsps.has(ns)) {
+				self.io._nsps.delete(ns);
+			}
+
+			done();
 		});
 	}
 

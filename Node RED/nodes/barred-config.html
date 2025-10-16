@@ -1,0 +1,53 @@
+<script type="text/javascript">
+	RED.nodes.registerType('barred-config', {
+		category: 'config',
+		defaults: {
+			name: { value: 'BARRED Config', required: true },
+			department: { value: 'GOODS IN', required: true },
+			color: { value: '#e49191', required: true },
+			rate: { value: 500, required: true }
+		},
+		label: function () {
+			return this.name;
+		}
+	});
+</script>
+
+<!-- prettier-ignore -->
+<script type="text/x-red" data-template-name="barred-config">
+    
+    <h3>Basic</h3>
+	<hr />
+	<div class="form-row">
+	    <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+	    <input type="text" id="node-config-input-name">
+	</div>
+
+    <h3>Branding</h3>
+	<hr />
+	<div class="form-row">
+	    <label for="node-config-input-department"><i class="fa fa-tag"></i> Department</label>
+	    <input type="text" id="node-config-input-department" placeholder="GOODS IN">
+	</div>
+    <div class="form-row">
+	    <label for="node-config-input-department"><i class="fa fa-tag"></i> Color Theme</label>
+	    <input type="color" id="node-config-input-color" placeholder="#e49191">
+	</div>
+    <div class="form-row">
+	    <label for="node-config-input-logo"><i class="fa fa-tag"></i> Logo</label>
+	    <input type="file" accept="image/png">
+	</div>
+
+	<h3>Settings</h3>
+	<hr />
+	<div class="form-row">
+	    <label for="node-config-input-rate"><i class="fa fa-tag"></i> Scan Rate (MS)</label>
+	    <input type="number" id="node-config-input-rate" placeholder="500">
+	</div>
+
+</script>
+
+<!-- prettier-ignore -->
+<script type="text/markdown" data-help-name="barred-config">
+<p>BARRED Config Node</p>
+</script>

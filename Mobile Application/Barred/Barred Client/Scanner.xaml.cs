@@ -27,11 +27,15 @@ public partial class Scanner : ContentPage
     
     private void Log(params object[]  Log)
     {
-        Status.Text = $"[ {DateTime.Now.ToString("dd.MM.yyyy HH:mm")} ]{Environment.NewLine}{Environment.NewLine}";
-        foreach (object V in Log)
+        MainThread.BeginInvokeOnMainThread(() =>
         {
-            Status.Text += $"{V}{Environment.NewLine}";
-        }
+            Status.Text = $"{DateTime.Now.ToString("dd.MM.yyyy HH:mm")}:{Environment.NewLine}";
+            foreach (object V in Log)
+            {
+                Status.Text += $"{V}{Environment.NewLine}";
+            }
+        });
+       
     }
     
     public Scanner(IAudioManager AudioManager)
@@ -48,18 +52,20 @@ public partial class Scanner : ContentPage
         SocketIOOptions Ops = new SocketIOOptions();
         Ops.Path = MauiProgram._Enrollment.Namespace;
         Dictionary<string,object> Auth = new Dictionary<string, object>();
-        Auth.Add("id","scanner123");
+        Auth.Add("id",MauiProgram._Enrollment.ClientID);
         Ops.Auth = Auth;
         
         SOK = new SocketIOClient.SocketIO(MauiProgram._Enrollment.StackEndpoint, Ops);
 
         SOK.OnError += (sender, s) =>
         {
-            Log(s);
+            AM_ERROR.Play();
+            Log($"ERROR: {s}");
         };
         SOK.OnDisconnected += (sender, s) => { Log($"Lost connection to the Stack"); };
         SOK.OnConnected += (sender, args) =>
         {
+            AM_OK.Play();
             Log("Scanner Ready!");
         };
         await SOK.ConnectAsync(CancellationToken.None);
@@ -75,40 +81,47 @@ public partial class Scanner : ContentPage
 
     private void ScannerEl_OnOnDetectionFinished(object? sender, OnDetectionFinishedEventArg e)
     {
-        if(e.BarcodeResults.Any())
+        if (SOK.Connected)
         {
-            ScannerEl.PauseScanning = true;
-            
-            if (AudioSwitch.IsToggled)
+            if(e.BarcodeResults.Any())
             {
-                AM_OK.Play();
-            }
+                ScannerEl.PauseScanning = true;
             
-            Log("Sending...");
+                if (AudioSwitch.IsToggled)
+                {
+                    AM_OK.Play();
+                }
             
-            Dictionary<string,object> Payload = new Dictionary<string, object>();
+                Log("Sending...");
             
-            Dictionary<string,object> Barcode = new Dictionary<string, object>();
-            Barcode.Add("barcode",e.BarcodeResults.First().RawValue);
-            Barcode.Add("symbology",e.BarcodeResults.First().BarcodeFormat.ToString());
+                Dictionary<string,object> Payload = new Dictionary<string, object>();
             
-            Dictionary<string,object> Scanner = new Dictionary<string, object>();
-            Scanner.Add("id","scanner123");
-            Scanner.Add("appVersion","0.0.0.8");
+                Dictionary<string,object> Barcode = new Dictionary<string, object>();
+                Barcode.Add("barcode",e.BarcodeResults.First().RawValue);
+                Barcode.Add("symbology",e.BarcodeResults.First().BarcodeFormat.ToString());
             
-            TimeSpan t = DateTime.UtcNow - new DateTime(1970, 1, 1);
-            Payload.Add("timestamp", t.TotalSeconds);
-            Payload.Add("barcode", Barcode);
-            Payload.Add("scanner", Scanner);
+                Dictionary<string,object> Scanner = new Dictionary<string, object>();
+                Scanner.Add("id",MauiProgram._Enrollment.ClientID);
+                Scanner.Add("appVersion","0.0.0.8");
+            
+                TimeSpan t = DateTime.UtcNow - new DateTime(1970, 1, 1);
+                Payload.Add("timestamp", t.TotalSeconds);
+                Payload.Add("barcode", Barcode);
+                Payload.Add("scanner", Scanner);
 
-            SOK.EmitAsync("BARRED.Barcode", Payload);
+                SOK.EmitAsync("BARRED.Barcode", Payload).ContinueWith((E) =>
+                {
+                    Log($"Sent: {e.BarcodeResults.First().RawValue}");
+                });
             
-            new Task(() =>
-            {
-                Thread.Sleep(500);
-                ScannerEl.PauseScanning = false;
-            }).Start();
+                new Task(() =>
+                {
+                    Thread.Sleep(500);
+                    ScannerEl.PauseScanning = false;
+                }).Start();
+            }
         }
+        
     }
 
     private async void Button_OnClicked(object? sender, EventArgs e)

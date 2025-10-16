@@ -12,10 +12,21 @@ namespace Barred_Client;
 
 public partial class Enrol : ContentPage
 {
+    private static IAudioManager AM;
+    private static IAudioPlayer AM_OK;
+    private static IAudioPlayer AM_ERROR;
     
-    public Enrol()
+    public Enrol(IAudioManager AudioManager)
     {
         InitializeComponent();
+        AM = AudioManager;
+        SetupAudio();
+    }
+    
+    private async void SetupAudio()
+    {
+        AM_OK = AM.CreatePlayer(await FileSystem.OpenAppPackageFileAsync("OK.mp3"));
+        AM_ERROR = AM.CreatePlayer(await FileSystem.OpenAppPackageFileAsync("ERROR.mp3"));
     }
 
     protected override void OnDisappearing()
@@ -52,11 +63,13 @@ public partial class Enrol : ContentPage
                             {
                                 if (!Semver.SemVersion.Parse(I.StackVersion).SatisfiesNpm(MauiProgram._RequiredStackVersion))
                                 {
+                                    AM_ERROR.Play();
                                     await DisplayAlert("Error", "Sorry, The BARRED stack version is not supported in this Client version.", "OK");
                                     Scanner.PauseScanning = false;
                                 }
                                 else
                                 {
+                                    AM_OK.Play();
                                     Microsoft.Maui.Storage.Preferences.Set("Enrollment",JSONs);
                                     MauiProgram._Enrollment = I;
                                     await Shell.Current.GoToAsync("Scanner");
@@ -64,6 +77,7 @@ public partial class Enrol : ContentPage
                             }
                             else
                             {
+                                AM_ERROR.Play();
                                 await DisplayAlert("Error", "Sorry, The scanned QR code, does not seem to be an Invitiation.", "OK");
                                 Scanner.PauseScanning = false;
                             }
@@ -73,6 +87,7 @@ public partial class Enrol : ContentPage
             }
             catch (Exception ex)
             {
+                AM_ERROR.Play();
                 await DisplayAlert("Error", "Sorry, The scanned QR code, does not seem to be an Invitiation.", "OK");
                 Scanner.PauseScanning = false;
             }

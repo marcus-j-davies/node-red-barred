@@ -13,8 +13,7 @@ module.exports = function (RED) {
 						payload: msg.payload,
 						payloadType: typeof msg.payload
 					});
-				}
-				else{
+				} else {
 					done(new Error('The BARRED response object has expired.'));
 					return;
 				}

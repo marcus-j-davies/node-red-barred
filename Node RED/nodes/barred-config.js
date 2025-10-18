@@ -52,10 +52,7 @@ module.exports = function (RED) {
 					payload: {
 						timestamp: args.timestmp,
 						item: { ...args.item },
-						scanner: {
-							id: args.scanner.scannerId,
-							appVersion: args.scanner.appVersion
-						}
+						scanner: { ...args.barcode }
 					}
 				};
 
@@ -72,10 +69,7 @@ module.exports = function (RED) {
 					payload: {
 						timestamp: args.timestamp,
 						barcode: { ...args.barcode },
-						scanner: {
-							id: args.scanner.id,
-							appVersion: args.scanner.appVersion
-						}
+						scanner: { ...args.barcode }
 					}
 				};
 

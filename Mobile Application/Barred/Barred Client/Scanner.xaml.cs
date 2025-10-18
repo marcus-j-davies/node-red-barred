@@ -51,13 +51,16 @@ public partial class Scanner : ContentPage
             else
             {
                 Dictionary<string, object> Props = (Dictionary<string, object>)Obj;
+
+                int Pad = Props.Keys.Max((K) => K.Length) + 2;
+                
                 foreach (string KEY in Props.Keys)
                 {
                     Status.FormattedText.Spans.Add(new Span
                     {
                         FontFamily = "Courier New",
                         FontAttributes = FontAttributes.Bold,
-                        Text = $"{KEY}: ".PadRight(15,' ')
+                        Text = $"{KEY}: ".PadRight(Pad,' ')
                     });
                     Status.FormattedText.Spans.Add(new Span
                     {

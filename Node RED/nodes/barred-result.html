@@ -1,0 +1,47 @@
+<script type="text/javascript">
+	RED.nodes.registerType('barred-result', {
+		category: 'BARRED',
+		color: 'rgb(228, 145, 145)',
+		paletteLabel: 'Send Result',
+		icon: 'font-awesome/fa-paper-plane',
+		defaults: {
+			name: { value: 'Send Result', required: true },
+			defaultStatus: { value: 'OK', required: true },
+			
+		},
+		outputs: 1,
+		inputs: 1,
+		label: function () {
+			return this.name;
+		}
+	});
+</script>
+
+<!-- prettier-ignore -->
+<script type="text/x-red" data-template-name="barred-result">
+    
+    <h3>Basic</h3>
+	<hr />
+	<div class="form-row">
+	    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+	    <input type="text" id="node-input-name">
+	</div>
+
+	<h3>Settings</h3>
+	<hr />
+	<div class="form-row">
+	    <label for="node-input-defaultStatus"><i class="fa fa-check-square-o"></i> Default Status</label>
+	    <select id="node-input-defaultStatus">
+			<option value="OK">OK</option>
+			<option value="ERROR">ERROR</option>
+		</select>
+	</div>
+   
+
+
+</script>
+
+<!-- prettier-ignore -->
+<script type="text/markdown" data-help-name="barred-result">
+<p>BARRED Incoming Barcode Node</p>
+</script>

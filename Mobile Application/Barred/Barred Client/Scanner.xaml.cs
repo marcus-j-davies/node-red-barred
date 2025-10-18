@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using BarcodeScanning;
 using Plugin.Maui.Audio;
@@ -25,17 +26,51 @@ public partial class Scanner : ContentPage
         base.OnDisappearing();
     }
     
-    private void Log(params object[]  Log)
+    private void ProcessResult(object Obj)
     {
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            Status.Text = $"{DateTime.Now.ToString("dd.MM.yyyy HH:mm")}:{Environment.NewLine}";
-            foreach (object V in Log)
+            Status.FormattedText.Spans.Clear();
+            Status.FormattedText.Spans.Add(new Span
             {
-                Status.Text += $"{V}{Environment.NewLine}";
+                FontAttributes = FontAttributes.Bold,
+                Text = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss")
+            });
+            Status.FormattedText.Spans.Add(new Span
+            {
+                Text = "\n--------------------------\n\n"
+            });
+
+            if (typeof(string) == Obj.GetType())
+            {
+                Status.FormattedText.Spans.Add(new Span
+                {
+                    Text = Obj.ToString()
+                });
+            }
+            else
+            {
+                Dictionary<string, object> Props = (Dictionary<string, object>)Obj;
+                foreach (string KEY in Props.Keys)
+                {
+                    Status.FormattedText.Spans.Add(new Span
+                    {
+                        FontFamily = "Courier New",
+                        FontAttributes = FontAttributes.Bold,
+                        Text = $"{KEY}: ".PadRight(15,' ')
+                    });
+                    Status.FormattedText.Spans.Add(new Span
+                    {
+                        FontFamily = "Courier New",
+                        Text = Props[KEY].ToString()
+                    });
+                    Status.FormattedText.Spans.Add(new Span
+                    {
+                        Text = "\n"
+                    });
+                }
             }
         });
-       
     }
     
     public Scanner(IAudioManager AudioManager)
@@ -48,7 +83,7 @@ public partial class Scanner : ContentPage
 
     private async void SetupConnection()
     {
-        Log("Connecting to Stack...");
+        ProcessResult("Connecting to Stack...");
         SocketIOOptions Ops = new SocketIOOptions();
         Ops.Path = MauiProgram._Enrollment.Namespace;
         Dictionary<string,object> Auth = new Dictionary<string, object>();
@@ -60,13 +95,17 @@ public partial class Scanner : ContentPage
         SOK.OnError += (sender, s) =>
         {
             AM_ERROR.Play();
-            Log($"ERROR: {s}");
+            ProcessResult($"ERROR: {s}");
         };
-        SOK.OnDisconnected += (sender, s) => { Log($"Lost connection to the Stack"); };
+        SOK.OnDisconnected += (sender, s) =>
+        {
+            AM_ERROR.Play();
+            ProcessResult("Lost connection to the Stack");
+        };
         SOK.OnConnected += (sender, args) =>
         {
             AM_OK.Play();
-            Log("Scanner Ready!");
+            ProcessResult("Scanner Ready!");
         };
         await SOK.ConnectAsync(CancellationToken.None);
     }
@@ -86,13 +125,8 @@ public partial class Scanner : ContentPage
             if(e.BarcodeResults.Any())
             {
                 ScannerEl.PauseScanning = true;
-            
-                if (AudioSwitch.IsToggled)
-                {
-                    AM_OK.Play();
-                }
-            
-                Log("Sending...");
+                
+                ProcessResult("Sending...");
             
                 Dictionary<string,object> Payload = new Dictionary<string, object>();
             
@@ -104,24 +138,58 @@ public partial class Scanner : ContentPage
                 Scanner.Add("id",MauiProgram._Enrollment.ClientID);
                 Scanner.Add("appVersion","0.0.0.8");
             
-                TimeSpan t = DateTime.UtcNow - new DateTime(1970, 1, 1);
-                Payload.Add("timestamp", t.TotalSeconds);
+                long unixTimeMillis = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                Payload.Add("timestamp", unixTimeMillis);
                 Payload.Add("barcode", Barcode);
                 Payload.Add("scanner", Scanner);
 
-                SOK.EmitAsync("BARRED.Barcode", Payload).ContinueWith((E) =>
+                Action<SocketIOResponse> Callback = (response) =>
                 {
-                    Log($"Sent: {e.BarcodeResults.First().RawValue}");
+                    BarcodeResponse Res = response.GetValue<BarcodeResponse>(0);
+                    string Status = Res.status;
+                    string PayloadType = Res.payloadType;
+                    object Payload = Res.payload;
+
+                    switch (PayloadType)
+                    {
+                       case "string":
+                           Payload = Payload.ToString();
+                           break;
+                       
+                       case "object":
+                           Payload = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string,object>>(Payload.ToString());
+                           break;
+
+                    }
+                    
+                    if (AudioSwitch.IsToggled)
+                    {
+                        if (Status == "ERROR") AM_ERROR.Play();
+                        else if (Status == "OK") AM_OK.Play();
+                        else if (Status == "PROMPT") AM_PROMPT.Play();
+                    }
+                    
+                    if (Status == "PROMPT")
+                    {
+                        // manage Request
+                        return;
+                    }
+                    
+                    ProcessResult(Payload);
+                };
+
+                SOK.EmitAsync("BARRED.Barcode",Callback,Payload).ContinueWith((t) =>
+                {
+                    ProcessResult($"Sent: {e.BarcodeResults.First().RawValue}");
                 });
             
                 new Task(() =>
                 {
-                    Thread.Sleep(500);
+                    Thread.Sleep(MauiProgram._Enrollment.ScanRate);
                     ScannerEl.PauseScanning = false;
                 }).Start();
             }
         }
-        
     }
 
     private async void Button_OnClicked(object? sender, EventArgs e)

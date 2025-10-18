@@ -9,6 +9,7 @@ public class Invitiation
     public string ClientID { get; set; }
     public string ClientLabel { get; set; }
     public Theme Theme { get; set; }
+    public int ScanRate { get; set; }
 }
 
 public class Theme

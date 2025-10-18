@@ -91,6 +91,31 @@
                     Offset="5,5"
                     Opacity="0.8" />
             </Border.Shadow>
+
+            <ScrollView
+                BackgroundColor="LightGrey"
+                HorizontalOptions="FillAndExpand"
+                Padding="5"
+                VerticalOptions="FillAndExpand">
+                <Label
+                    FontFamily="Courier New"
+                    FontSize="16"
+                    LineBreakMode="WordWrap"
+                    x:Name="Status">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span FontAttributes="Bold" Text="StackEndpoint: " />
+                            <Span Text="https://api.example.com" />
+                            <Span Text="&#10;" />
+                            <Span FontAttributes="Bold" Text="StackEndpoint: " />
+                            <Span Text="https://api.example.com" />
+                            <Span Text="&#10;" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+
+            </ScrollView>
+            <!--
             <Editor
                 BackgroundColor="LightGrey"
                 FontSize="16"
@@ -99,6 +124,7 @@
                 TextColor="Black"
                 VerticalOptions="FillAndExpand"
                 x:Name="Status" />
+            -->
         </Border>
 
         <Grid

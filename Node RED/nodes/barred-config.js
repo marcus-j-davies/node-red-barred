@@ -1,7 +1,7 @@
 const { Server } = require('socket.io');
 module.exports = function (RED) {
-	function Config(Config) {
-		RED.nodes.createNode(this, Config);
+	function BarredConfig(config) {
+		RED.nodes.createNode(this, config);
 		const self = this;
 		const connectedScanners = {};
 		const barcodeEmitters = {};
@@ -30,13 +30,13 @@ module.exports = function (RED) {
 		};
 		self.io = new Server(RED.server, ioOptions);
 
-		Config.scanners = {
-			'scanner123':'Test'
-		}
+		config.scanners = {
+			scanner123: 'Test'
+		};
 
 		self.io.use((socket, next) => {
 			const { id } = socket.handshake.auth;
-			if (!Config.scanners[id]) {
+			if (!config.scanners[id]) {
 				return next(new Error('Unauthorized'));
 			}
 			next();
@@ -45,10 +45,10 @@ module.exports = function (RED) {
 		self.io.on('connection', (scanner) => {
 			connectedScanners[scanner.id] = scanner;
 
-			scanner.on('BARRED.Item', (args) => {
+			scanner.on('BARRED.Item', (args, callback) => {
 				const msg = {
-					_socket: scanner,
-					topic: args.type,
+					_barredCB: callback,
+					topic: args.item.type,
 					payload: {
 						timestamp: args.timestmp,
 						item: { ...args.item },
@@ -62,9 +62,12 @@ module.exports = function (RED) {
 				Object.values(itemEmitters).forEach((emitter) => emitter(msg));
 			});
 
-			scanner.on('BARRED.Barcode', (args) => {
+			scanner.on('BARRED.Barcode', (args, callback) => {
 				const msg = {
-					_socket: scanner,
+					_barredCB: {
+						expires: new Date().getTime() + parseInt(config.rtimeout),
+						callback: callback
+					},
 					topic: args.barcode.barcode,
 					payload: {
 						timestamp: args.timestamp,
@@ -105,14 +108,5 @@ module.exports = function (RED) {
 		});
 	}
 
-	RED.nodes.registerType('barred-config', Config);
+	RED.nodes.registerType('barred-config', BarredConfig);
 };
-
-/*
-const socket = io('/your-path', {
-	path: '/your-node-id',
-	auth: {
-		id: 'scanner123'
-	}
-});
-*/

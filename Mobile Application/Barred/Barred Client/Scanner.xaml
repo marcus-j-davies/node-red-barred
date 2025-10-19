@@ -29,7 +29,7 @@
             <Label
                 FontSize="24"
                 Grid.Column="1"
-                Text="{x:Static program:MauiProgram.Department}"
+                Text="{x:Static program:MauiProgram.Group}"
                 VerticalOptions="Center" />
         </Grid>
 

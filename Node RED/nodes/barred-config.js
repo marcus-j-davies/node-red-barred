@@ -1,4 +1,6 @@
 const { Server } = require('socket.io');
+const path = require('path');
+const fs = require('fs');
 module.exports = function (RED) {
 	function BarredConfig(config) {
 		RED.nodes.createNode(this, config);
@@ -30,10 +32,6 @@ module.exports = function (RED) {
 		};
 		self.io = new Server(RED.server, ioOptions);
 
-		config.scanners = {
-			scanner123: 'Test'
-		};
-
 		self.io.use((socket, next) => {
 			const { id } = socket.handshake.auth;
 			if (!config.scanners[id]) {
@@ -52,7 +50,7 @@ module.exports = function (RED) {
 					payload: {
 						timestamp: args.timestmp,
 						item: { ...args.item },
-						scanner: { ...args.barcode }
+						scanner: { ...args.scanner }
 					}
 				};
 
@@ -69,7 +67,7 @@ module.exports = function (RED) {
 					payload: {
 						timestamp: args.timestamp,
 						barcode: { ...args.barcode },
-						scanner: { ...args.barcode }
+						scanner: { ...args.scanner }
 					}
 				};
 
@@ -103,4 +101,16 @@ module.exports = function (RED) {
 	}
 
 	RED.nodes.registerType('barred-config', BarredConfig);
+
+	RED.httpAdmin.get('/barred-api/geticon/:instanceid', (request, response) => {});
+
+	RED.httpAdmin.post('/barred-api/seticon/:instanceid', (request, response) => {
+		const Root = path.join(RED.settings.userDir || '', 'barred', request.params.instanceid);
+
+		if (!fs.existsSync(Root)) {
+			fs.mkdirSync(Root, { recursive: true });
+		}
+
+		response.status(200).send({ message: 'Directory ready' });
+	});
 };

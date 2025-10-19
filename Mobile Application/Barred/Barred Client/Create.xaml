@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup
+    CanBeDismissedByTappingOutsideOfPopup="False"
+    x:Class="Barred_Client.Create"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <ScrollView Height="400" Padding="5">
+        <StackLayout>
+            <Label Text="Input" />
+        </StackLayout>
+    </ScrollView>
+
+
+
+</toolkit:Popup>

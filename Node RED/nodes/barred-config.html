@@ -1,3 +1,4 @@
+<script type="text/javascript" src="resources/@marcus-j-davies/node-red-barred/qrcode.min.js"></script>
 <script type="text/javascript">
 	RED.nodes.registerType('barred-config', {
 		category: 'config',
@@ -5,13 +6,140 @@
 			name: { value: 'BARRED Config', required: true },
 			department: { value: 'GOODS IN', required: true },
 			color: { value: '#e49191', required: true },
-			rate: { value: 500, required: true },
-			rtimeout: { value: 250, required: true }
+			rate: { value: 1000, required: true },
+			rtimeout: { value: 500, required: true },
+			scanners: { value: {} }
 		},
 		label: function () {
 			return this.name;
-		}
+		},
+		oneditprepare: SortUI,
+		oneditsave: SaveScanners
 	});
+
+	let EditingBarredConfig;
+
+	async function gzipString(inputStr) {
+		const encoder = new TextEncoder();
+		const inputData = encoder.encode(inputStr);
+		const inputStream = new Response(inputData).body;
+		const compressionStream = new CompressionStream('gzip');
+		const compressedStream = inputStream.pipeThrough(compressionStream);
+		const compressedResponse = new Response(compressedStream);
+		const compressedBlob = await compressedResponse.blob();
+		const arrayBuffer = await compressedBlob.arrayBuffer();
+
+		const uint8Array = new Uint8Array(arrayBuffer);
+		let binary = '';
+		for (let i = 0; i < uint8Array.length; i++) {
+			binary += String.fromCharCode(uint8Array[i]);
+		}
+		const base64String = btoa(binary);
+
+		return base64String;
+	}
+
+	async function GenQR(Index) {
+		const Host = window.location.origin;
+		const Obj = {
+			StackEndpoint: Host,
+			Namespace: `/barred-${EditingBarredConfig}/`,
+			StackVersion: '0.0.5',
+			Group: $('#node-config-input-department').val(),
+			ScanRate: Number($('#node-config-input-rate').val()),
+			Theme: {
+				Color: $('#node-config-input-color').val(),
+				IconURL: `${Host}/barred-api/geticon/${EditingBarredConfig}`
+			},
+			ClientID: $(`#scanner_${Index}_id`).val(),
+			ClientLabel: $(`#scanner_${Index}_name`).val()
+		};
+
+		const GZIPB64 = await gzipString(JSON.stringify(Obj));
+
+		$(`#barred-qr-${Index}`).empty();
+
+		const QR = new QRCode(document.getElementById(`barred-qr-${Index}`), {
+			text: GZIPB64,
+			width: 160,
+			height: 160,
+			colorDark: '#000000',
+			colorLight: '#ffffff',
+			correctLevel: QRCode.CorrectLevel.L
+		});
+
+		setTimeout(() => {
+			$(`#barred-qr-${Index}`).find('img').css('display', '');
+		}, 100);
+	}
+
+	function GenerateUUID() {
+		var d = new Date().getTime();
+		var d2 = (typeof performance !== 'undefined' && performance.now && performance.now() * 1000) || 0;
+		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+			var r = Math.random() * 16;
+			if (d > 0) {
+				r = (d + r) % 16 | 0;
+				d = Math.floor(d / 16);
+			} else {
+				r = (d2 + r) % 16 | 0;
+				d2 = Math.floor(d2 / 16);
+			}
+			return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+		});
+	}
+
+	function AddItem(container, index, data) {
+		if (!data.index) {
+			data.index = index;
+			data.scannerLabel = 'Scanner A';
+			data.scannerId = GenerateUUID();
+		}
+
+		$(container).data('data', data);
+		$(container).css({ minWidth: '400px' });
+
+		const HTML = `
+			<div class="form-row">
+				<label for="scanner_${index}_name"><i class="fa fa-tag"></i> Name</label>
+				<input type="text" id="scanner_${index}_name" value="${data.scannerLabel}">
+			</div>
+			<div class="form-row">
+				<label for="${index}_id"><i class="fa fa-id-card-o"></i> ID</label>
+				<input type="text" id="scanner_${index}_id"  value="${data.scannerId}" readonly="readonly">
+			</div>
+			<div class="form-row">
+				<label for="scanner_${index}_qr"><i class="fa fa-barcode"></i> Invitiation</label>
+				<button onclick="GenQR('${index}')" id="scanner_${index}_qr">Generate QR Code</button>
+			</div>
+			<div id="barred-qr-${index}" style="text-align: center;margin: auto;"></div>
+		`;
+
+		$(container).html(HTML);
+	}
+
+	function SaveScanners() {
+		const Scanners = $('#scanners').editableList('items');
+		this.scanners = {};
+		for (let i = 0; i < Scanners.length; i++) {
+			const ScannerData = Scanners[i].data('data');
+			this.scanners[ScannerData.index] = ScannerData;
+		}
+	}
+
+	function SortUI() {
+		EditingBarredConfig = this.id;
+		$('#scanners').editableList({
+			header: $('<div>').append('<div>Scanners</div>'),
+			removable: true,
+			addButton: 'Add Scanner',
+			addItem: AddItem
+		});
+
+		Object.values(this.scanners).forEach((S) => {
+			$('#scanners').editableList('addItem', S);
+		});
+	}
 </script>
 
 <!-- prettier-ignore -->
@@ -31,7 +159,7 @@
 	    <input type="text" id="node-config-input-department" placeholder="GOODS IN">
 	</div>
     <div class="form-row">
-	    <label for="node-config-input-department"><i class="fa fa-paint-brush"></i> Color Theme</label>
+	    <label for="node-config-input-color"><i class="fa fa-paint-brush"></i> Color Theme</label>
 	    <input type="color" id="node-config-input-color" placeholder="#e49191">
 	</div>
     <div class="form-row">
@@ -43,11 +171,17 @@
 	<hr />
 	<div class="form-row">
 	    <label for="node-config-input-rate"><i class="fa fa-repeat"></i> Scan Rate</label>
-	    <input type="number" id="node-config-input-rate" placeholder="500">
+	    <input type="number" id="node-config-input-rate" placeholder="1000">
 	</div>
 	<div class="form-row">
 	    <label for="node-config-input-rtimeout"><i class="fa fa-hourglass"></i> Result Timeout</label>
-	    <input type="number" id="node-config-input-rtimeout" placeholder="250">
+	    <input type="number" id="node-config-input-rtimeout" placeholder="500">
+	</div>
+
+	<h3>Scanners</h3>
+	<hr />
+	<div>
+	      <ol id="scanners" style="min-height:350px;min-width:400px"> </ol>
 	</div>
 	
 

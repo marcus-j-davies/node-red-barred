@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using BarcodeScanning;
 using Plugin.Maui.Audio;
 using SocketIOClient;
+using CommunityToolkit.Maui.Views;
+
 
 namespace Barred_Client;
 
@@ -146,7 +148,7 @@ public partial class Scanner : ContentPage
                 Payload.Add("barcode", Barcode);
                 Payload.Add("scanner", Scanner);
 
-                Action<SocketIOResponse> Callback = (response) =>
+                Action<SocketIOResponse> Callback = async (response) =>
                 {
                     BarcodeResponse Res = response.GetValue<BarcodeResponse>(0);
                     string Status = Res.status;
@@ -169,12 +171,13 @@ public partial class Scanner : ContentPage
                     {
                         if (Status == "ERROR") AM_ERROR.Play();
                         else if (Status == "OK") AM_OK.Play();
-                        else if (Status == "PROMPT") AM_PROMPT.Play();
+                        else if (Status == "CREATE") AM_PROMPT.Play();
                     }
                     
-                    if (Status == "PROMPT")
+                    if (Status == "CREATE")
                     {
-                        // manage Request
+                        Create C = new Create();
+                        object ff  = await this.ShowPopupAsync(C);
                         return;
                     }
                     

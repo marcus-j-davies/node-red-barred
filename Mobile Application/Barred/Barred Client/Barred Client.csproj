@@ -23,7 +23,7 @@
         <ApplicationTitle>Barred</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.marcusjdavies.BARRED</ApplicationId>
+        <ApplicationId>com.marcusjdavies.barred</ApplicationId>
 
         <!-- Versions -->
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>

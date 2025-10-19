@@ -11,7 +11,7 @@ public static class MauiProgram
     public static Invitiation _Enrollment;
 
     public static Color ThemeColor => Color.FromArgb(_Enrollment.Theme.Color);
-    public static string Department => _Enrollment.Department;
+    public static string Group => _Enrollment.Group;
     public static string UserLabel => _Enrollment.ClientLabel;
     public static MauiApp CreateMauiApp()
     {

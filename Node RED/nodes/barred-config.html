@@ -1,5 +1,7 @@
 <script type="text/javascript" src="resources/@marcus-j-davies/node-red-barred/qrcode.min.js"></script>
 <script type="text/javascript">
+	const BarredHost = window.location.origin;
+	let EditingBarredConfig;
 	RED.nodes.registerType('barred-config', {
 		category: 'config',
 		defaults: {
@@ -8,7 +10,8 @@
 			color: { value: '#e49191', required: true },
 			rate: { value: 1000, required: true },
 			rtimeout: { value: 500, required: true },
-			scanners: { value: {} }
+			scanners: { value: {}, required: true },
+			host: { value: BarredHost, required: true }
 		},
 		label: function () {
 			return this.name;
@@ -16,8 +19,6 @@
 		oneditprepare: SortUI,
 		oneditsave: SaveScanners
 	});
-
-	let EditingBarredConfig;
 
 	async function gzipString(inputStr) {
 		const encoder = new TextEncoder();
@@ -40,16 +41,15 @@
 	}
 
 	async function GenQR(Index) {
-		const Host = window.location.origin;
 		const Obj = {
-			StackEndpoint: Host,
+			StackEndpoint: $('#node-config-input-host').val(),
 			Namespace: `/barred-${EditingBarredConfig}/`,
 			StackVersion: '0.0.5',
 			Group: $('#node-config-input-department').val(),
 			ScanRate: Number($('#node-config-input-rate').val()),
 			Theme: {
 				Color: $('#node-config-input-color').val(),
-				IconURL: `${Host}/barred-api/geticon/${EditingBarredConfig}`
+				IconURL: `${$('#node-config-input-host').val()}/barred-api/geticon/${EditingBarredConfig}`
 			},
 			ClientID: $(`#scanner_${Index}_id`).val(),
 			ClientLabel: $(`#scanner_${Index}_name`).val()
@@ -123,7 +123,7 @@
 		this.scanners = {};
 		for (let i = 0; i < Scanners.length; i++) {
 			const ScannerData = Scanners[i].data('data');
-			this.scanners[ScannerData.index] = ScannerData;
+			this.scanners[ScannerData.scannerId] = ScannerData;
 		}
 	}
 
@@ -176,6 +176,13 @@
 	<div class="form-row">
 	    <label for="node-config-input-rtimeout"><i class="fa fa-hourglass"></i> Result Timeout</label>
 	    <input type="number" id="node-config-input-rtimeout" placeholder="500">
+	</div>
+	<div class="form-row">
+	    <label for="node-config-input-host"><i class="fa fa-globe"></i> Host</label>
+	    <input type="text" id="node-config-input-host" placeholder="http://x.x.x.x:1880">
+	</div>
+	<div class="form-tips" id="node-tip">
+		Update the <strong>Host</strong> value, if it does not represent the IP/Hostname that the scanner will connect to, i.e 127.0.0.1 is likely incorrect.
 	</div>
 
 	<h3>Scanners</h3>

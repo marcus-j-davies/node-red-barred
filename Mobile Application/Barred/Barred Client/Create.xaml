@@ -1,17 +1,60 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <toolkit:Popup
     CanBeDismissedByTappingOutsideOfPopup="False"
+    Size="350,600"
     x:Class="Barred_Client.Create"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <ScrollView Height="400" Padding="5">
-        <StackLayout>
-            <Label Text="Input" />
-        </StackLayout>
-    </ScrollView>
+    <Grid
+        Padding="5"
+        RowDefinitions="*, Auto"
+        RowSpacing="20">
+
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Spacing="15">
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="20"
+                    HorizontalOptions="Center"
+                    Text="Contact Form" />
+
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Name" />
+                    <Entry Placeholder="Enter your name" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Email" />
+                    <Entry Keyboard="Email" Placeholder="Enter your email" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Message" />
+                    <Editor
+                        AutoSize="TextChanges"
+                        HeightRequest="100"
+                        Placeholder="Type your message" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
 
 
+        <HorizontalStackLayout
+            Grid.Row="1"
+            HorizontalOptions="Center"
+            Spacing="10"
+            VerticalOptions="End">
+            <Button
+                BackgroundColor="#CCCCCC"
+                Text="Cancel"
+                TextColor="Black" />
 
+            <Button
+                BackgroundColor="#007AFF"
+                Text="Submit"
+                TextColor="White" />
+        </HorizontalStackLayout>
+    </Grid>
 </toolkit:Popup>

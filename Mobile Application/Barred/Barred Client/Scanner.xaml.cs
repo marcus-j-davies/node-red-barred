@@ -176,9 +176,13 @@ public partial class Scanner : ContentPage
                     
                     if (Status == "CREATE")
                     {
-                        Create C = new Create();
-                        object ff  = await this.ShowPopupAsync(C);
-                        return;
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            Create C = new Create();
+                            object ff  = await this.ShowPopupAsync(C);
+                            return;
+                        });
+                      
                     }
                     
                     ProcessResult(Payload);

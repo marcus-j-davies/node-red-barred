@@ -1,0 +1,43 @@
+<script type="text/javascript">
+	RED.nodes.registerType('barred-item', {
+		category: 'BARRED',
+		color: 'rgb(228, 145, 145)',
+		paletteLabel: 'Incoming Item',
+		icon: 'font-awesome/fa-info-circle',
+		defaults: {
+			name: { value: 'Incoming Items', required: true },
+			stack: {
+				value: '',
+				required: true,
+				type: 'barred-config'
+			}
+		},
+		outputs: 1,
+		inputs: 0,
+		label: function () {
+			return this.name;
+		}
+	});
+</script>
+
+<!-- prettier-ignore -->
+<script type="text/x-red" data-template-name="barred-item">
+    
+    <h3>Basic</h3>
+	<hr />
+	<div class="form-row">
+	    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+	    <input type="text" id="node-input-name">
+	</div>
+    <div class="form-row">
+	    <label for="node-input-stack"><i class="fa fa-cog"></i> BARRED Stack</label>
+	    <input type="text" id="node-input-stack">
+	</div>
+
+
+</script>
+
+<!-- prettier-ignore -->
+<script type="text/markdown" data-help-name="barred-item">
+<p>BARRED Incoming Item Node</p>
+</script>

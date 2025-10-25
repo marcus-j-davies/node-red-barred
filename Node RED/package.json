@@ -1,6 +1,6 @@
 {
 	"name": "@marcus-j-davies/node-red-barred",
-	"version": "0.0.43",
+	"version": "0.0.50",
 	"license": "MIT",
 	"description": "The Node RED Barcode Processing Platform",
 	"keywords": [
@@ -25,6 +25,7 @@
 		"nodes": {
 			"barred-config": "nodes/barred-config.js",
 			"barred-barcode": "nodes/barred-barcode.js",
+			"barred-item": "nodes/barred-item.js",
 			"barred-result": "nodes/barred-result.js"
 		}
 	},

@@ -89,8 +89,12 @@
 		});
 	}
 
+	function UpdateData(Data, Property, El) {
+		Data[Property] = $(El).val();
+	}
+
 	function AddItem(container, index, data) {
-		if (!data.index) {
+		if (!data.scannerId) {
 			data.index = index;
 			data.scannerLabel = 'Scanner A';
 			data.scannerId = GenerateUUID();
@@ -112,10 +116,21 @@
 				<label for="scanner_${index}_qr"><i class="fa fa-barcode"></i> Invitiation</label>
 				<button onclick="GenQR('${index}')" id="scanner_${index}_qr">Generate QR Code</button>
 			</div>
-			<div id="barred-qr-${index}" style="text-align: center;margin: auto;"></div>
+			<div class="form-tips" style="margin:auto">
+		      Ensure the QR code is scanned <strong>AFTER</strong> you have deployed any changes, generate it again - <strong>AFTER</strong> a deploy if needed. 
+			</div>
+			<div id="barred-qr-${index}" style="text-align: center;margin: auto; margin-top:10px; margoin-bottom:10px"></div>
+			
 		`;
 
 		$(container).html(HTML);
+
+		$(container)
+			.find(`#scanner_${index}_name`)
+			.on('change', function () {
+				UpdateData(data, 'scannerLabel', this);
+				RED.nodes.dirty(EditingBarredConfig);
+			});
 	}
 
 	function SaveScanners() {
@@ -137,6 +152,7 @@
 		});
 
 		Object.values(this.scanners).forEach((S) => {
+			console.log(S);
 			$('#scanners').editableList('addItem', S);
 		});
 	}
@@ -181,7 +197,7 @@
 	    <label for="node-config-input-host"><i class="fa fa-globe"></i> Host</label>
 	    <input type="text" id="node-config-input-host" placeholder="http://x.x.x.x:1880">
 	</div>
-	<div class="form-tips" id="node-tip">
+	<div class="form-tips" style="margin:auto">
 		Update the <strong>Host</strong> value, if it does not represent the IP/Hostname that the scanner will connect to, i.e 127.0.0.1 is likely incorrect.
 	</div>
 

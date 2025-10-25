@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const { Server } = require('socket.io');
 const path = require('path');
 const fs = require('fs');
@@ -43,12 +44,10 @@ module.exports = function (RED) {
 		self.io.on('connection', (scanner) => {
 			connectedScanners[scanner.id] = scanner;
 
-			scanner.on('BARRED.Item', (args, callback) => {
+			scanner.on('BARRED.Item', (args) => {
 				const msg = {
-					_barredCB: callback,
-					topic: args.item.type,
 					payload: {
-						timestamp: args.timestmp,
+						timestamp: args.timestamp,
 						item: { ...args.item },
 						scanner: { ...args.scanner }
 					}
@@ -63,7 +62,6 @@ module.exports = function (RED) {
 						expires: new Date().getTime() + parseInt(config.rtimeout),
 						callback: callback
 					},
-					topic: args.barcode.barcode,
 					payload: {
 						timestamp: args.timestamp,
 						barcode: { ...args.barcode },

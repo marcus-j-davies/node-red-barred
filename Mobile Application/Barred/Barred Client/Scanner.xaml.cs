@@ -221,6 +221,7 @@ public partial class Scanner : ContentPage
                             await this.ShowPopupAsync(C);
                           
                             List<Entry> Entries = C._ContentPH.GetDescendantsOfType<Entry>().ToList();
+                            List<Editor> Editors = C._ContentPH.GetDescendantsOfType<Editor>().ToList();
 
                             Dictionary<string, object> ItemPL = new Dictionary<string, object>();
                             long unixTimeMillis = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -238,6 +239,14 @@ public partial class Scanner : ContentPage
                                 if (E.ClassId != null)
                                 {
                                     Item.Add(E.ClassId, E.Keyboard == Keyboard.Numeric ? int.Parse(E.Text) : E.Text);
+                                }
+                            }
+                            
+                            foreach (Editor E in Editors) 
+                            {
+                                if (E.ClassId != null)
+                                {
+                                    Item.Add(E.ClassId, E.Text);
                                 }
                             }
                             

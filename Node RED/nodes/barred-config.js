@@ -31,7 +31,8 @@ module.exports = function (RED) {
 			origin: '*',
 			methods: ['GET', 'POST']
 		};
-		self.io = new Server(RED.server, ioOptions);
+		self.io = new Server(ioOptions);
+		self.io.listen(config.port);
 
 		self.io.use((socket, next) => {
 			const { id } = socket.handshake.auth;
@@ -78,30 +79,18 @@ module.exports = function (RED) {
 		});
 
 		self.on('close', (_, done) => {
-			const ns = `barred-${self.id}`;
-			const namespace = self.io.of(ns);
-
-			if (namespace.sockets) {
-				for (const [id, socket] of namespace.sockets) {
-					socket.disconnect(true);
-				}
-			}
-
-			Object.keys(connectedScanners).forEach((id) => delete connectedScanners[id]);
-			namespace.removeAllListeners();
-
-			if (self.io._nsps && self.io._nsps.has(ns)) {
-				self.io._nsps.delete(ns);
-			}
-
-			done();
+			self.io.sockets.sockets.forEach((socket) => socket.disconnect(true));
+			self.io.close(done);
 		});
 	}
 
 	RED.nodes.registerType('barred-config', BarredConfig);
 
-	RED.httpAdmin.get('/barred-api/geticon/:instanceid', (request, response) => {});
+	RED.httpAdmin.get('/barred-api/getversion', (request, response) => {
+		response.json({ version: require('../package.json').version });
+	});
 
+	RED.httpAdmin.get('/barred-api/geticon/:instanceid', (request, response) => {});
 	RED.httpAdmin.post('/barred-api/seticon/:instanceid', (request, response) => {
 		const Root = path.join(RED.settings.userDir || '', 'barred', request.params.instanceid);
 

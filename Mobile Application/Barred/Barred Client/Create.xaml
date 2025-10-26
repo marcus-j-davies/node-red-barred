@@ -45,13 +45,13 @@
                 VerticalOptions="End">
                 <Button
                     BackgroundColor="#CCCCCC"
-                    Clicked="Button_Submit"
+                    Clicked="Button_Cancel"
                     Text="Cancel"
                     TextColor="Black" />
 
                 <Button
                     BackgroundColor="{x:Static program:MauiProgram.ThemeColor}"
-                    Clicked="Button_Cancel"
+                    Clicked="Button_Submit"
                     Text="Submit"
                     TextColor="White" />
             </HorizontalStackLayout>

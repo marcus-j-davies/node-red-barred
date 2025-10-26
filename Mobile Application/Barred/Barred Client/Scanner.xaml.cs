@@ -218,7 +218,11 @@ public partial class Scanner : ContentPage
                                 
                             }
 
-                            await this.ShowPopupAsync(C);
+                            var  R = await this.ShowPopupAsync(C);
+                            if(!((bool)R))
+                            {
+                                return;
+                            }
                           
                             List<Entry> Entries = C._ContentPH.GetDescendantsOfType<Entry>().ToList();
                             List<Editor> Editors = C._ContentPH.GetDescendantsOfType<Editor>().ToList();
@@ -251,11 +255,13 @@ public partial class Scanner : ContentPage
                             }
                             
                             ItemPL.Add("item", Item);
-                            
+
                             SOK.EmitAsync("BARRED.Item", ItemPL).ContinueWith((t) =>
                             {
-                                ProcessResult($"Item Data Sent for Barcode {e.BarcodeResults.First().RawValue}, scan again to confirm if required.");
+                                ProcessResult($"Item Data Sent for Barcode, scan again to confirm if required.");
                             });
+                            
+                          
 
                         });
                     }

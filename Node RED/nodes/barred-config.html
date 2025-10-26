@@ -1,6 +1,5 @@
 <script type="text/javascript" src="resources/@marcus-j-davies/node-red-barred/qrcode.min.js"></script>
 <script type="text/javascript">
-	const BarredHost = window.location.origin;
 	let EditingBarredConfig;
 	RED.nodes.registerType('barred-config', {
 		category: 'config',
@@ -11,7 +10,8 @@
 			rate: { value: 1000, required: true },
 			rtimeout: { value: 500, required: true },
 			scanners: { value: {}, required: true },
-			host: { value: BarredHost, required: true }
+			host: { value: '', required: true },
+			port: { value: '', required: true }
 		},
 		label: function () {
 			return this.name;
@@ -19,6 +19,14 @@
 		oneditprepare: SortUI,
 		oneditsave: SaveScanners
 	});
+
+	function getHost() {
+		return window.location.hostname;
+	}
+
+	function genPort() {
+		return Math.floor(Math.random() * (60000 - 50000 + 1) + 50000);
+	}
 
 	async function gzipString(inputStr) {
 		const encoder = new TextEncoder();
@@ -41,15 +49,18 @@
 	}
 
 	async function GenQR(Index) {
+		const data = await new Promise((resolve, reject) => {
+			$.getJSON('barred-api/getversion').done(resolve).fail(reject);
+		});
 		const Obj = {
-			StackEndpoint: $('#node-config-input-host').val(),
+			StackEndpoint: `http://${$('#node-config-input-host').val()}:${$('#node-config-input-port').val()}`,
 			Namespace: `/barred-${EditingBarredConfig}/`,
-			StackVersion: '0.0.5',
+			StackVersion: data.version,
 			Group: $('#node-config-input-department').val(),
 			ScanRate: Number($('#node-config-input-rate').val()),
 			Theme: {
 				Color: $('#node-config-input-color').val(),
-				IconURL: `${$('#node-config-input-host').val()}/barred-api/geticon/${EditingBarredConfig}`
+				IconURL: `http://${$('#node-config-input-host').val()}:${$('#node-config-input-port').val()}/barred-api/geticon/${EditingBarredConfig}`
 			},
 			ClientID: $(`#scanner_${Index}_id`).val(),
 			ClientLabel: $(`#scanner_${Index}_name`).val()
@@ -104,24 +115,24 @@
 		$(container).css({ minWidth: '400px' });
 
 		const HTML = `
-			<div class="form-row">
-				<label for="scanner_${index}_name"><i class="fa fa-tag"></i> Name</label>
-				<input type="text" id="scanner_${index}_name" value="${data.scannerLabel}">
-			</div>
-			<div class="form-row">
-				<label for="${index}_id"><i class="fa fa-id-card-o"></i> ID</label>
-				<input type="text" id="scanner_${index}_id"  value="${data.scannerId}" readonly="readonly">
-			</div>
-			<div class="form-row">
-				<label for="scanner_${index}_qr"><i class="fa fa-barcode"></i> Invitiation</label>
-				<button onclick="GenQR('${index}')" id="scanner_${index}_qr">Generate QR Code</button>
-			</div>
-			<div class="form-tips" style="margin:auto">
-		      Ensure the QR code is scanned <strong>AFTER</strong> you have deployed any changes, generate it again - <strong>AFTER</strong> a deploy if needed. 
-			</div>
-			<div id="barred-qr-${index}" style="text-align: center;margin: auto; margin-top:10px; margoin-bottom:10px"></div>
-			
-		`;
+				<div class="form-row">
+					<label for="scanner_${index}_name"><i class="fa fa-tag"></i> Name</label>
+					<input type="text" id="scanner_${index}_name" value="${data.scannerLabel}">
+				</div>
+				<div class="form-row">
+					<label for="${index}_id"><i class="fa fa-id-card-o"></i> ID</label>
+					<input type="text" id="scanner_${index}_id"  value="${data.scannerId}" readonly="readonly">
+				</div>
+				<div class="form-row">
+					<label for="scanner_${index}_qr"><i class="fa fa-barcode"></i> Invitiation</label>
+					<button onclick="GenQR('${index}')" id="scanner_${index}_qr">Generate QR Code</button>
+				</div>
+				<div class="form-tips" style="margin:auto">
+			      Ensure the QR code is scanned <strong>AFTER</strong> you have deployed any changes, generate it again - <strong>AFTER</strong> a deploy if needed.
+				</div>
+				<div id="barred-qr-${index}" style="text-align: center;margin: auto; margin-top:10px; margoin-bottom:10px"></div>
+
+			`;
 
 		$(container).html(HTML);
 
@@ -144,6 +155,18 @@
 
 	function SortUI() {
 		EditingBarredConfig = this.id;
+
+		if (!this.host) {
+			this.host = getHost();
+			$('#node-config-input-host').val(this.host)
+
+		}
+
+		if (!this.port) {
+			this.port = genPort();
+			$('#node-config-input-port').val(this.port)
+		}
+
 		$('#scanners').editableList({
 			header: $('<div>').append('<div>Scanners</div>'),
 			removable: true,
@@ -195,10 +218,14 @@
 	</div>
 	<div class="form-row">
 	    <label for="node-config-input-host"><i class="fa fa-globe"></i> Host</label>
-	    <input type="text" id="node-config-input-host" placeholder="http://x.x.x.x:1880">
+	    <input type="text" id="node-config-input-host" placeholder="x.x.x.x">
+	</div>
+	<div class="form-row">
+	    <label for="node-config-input-port"><i class="fa fa-globe"></i> Port</label>
+	    <input type="text" id="node-config-input-port" placeholder="xxxxx">
 	</div>
 	<div class="form-tips" style="margin:auto">
-		Update the <strong>Host</strong> value, if it does not represent the IP/Hostname that the scanner will connect to, i.e 127.0.0.1 is likely incorrect.
+		Update the <strong>Host</strong> value, if it does not represent the IP/Hostname that the scanner will connect to, i.e 127.0.0.1 is likely incorrect. Ensure the <strong>Port</strong> is not in use by any other instance or another service on the host.
 	</div>
 
 	<h3>Scanners</h3>

@@ -46,7 +46,7 @@ public partial class Scanner : ContentPage
             {
                 Text = "\n--------------------------\n\n"
             });
-            
+
             if (typeof(string) == Obj.GetType())
             {
                 Status.FormattedText.Spans.Add(new Span
@@ -124,17 +124,20 @@ public partial class Scanner : ContentPage
             switch (IN.payloadType)
             {
                 case "object":
-                    IN.payload = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(IN.payload.ToString());
+                    IN.payload =
+                        Newtonsoft.Json.JsonConvert
+                            .DeserializeObject<Dictionary<string, object>>(IN.payload.ToString());
                     break;
-                
+
                 default:
                     IN.payload = IN.payload.ToString();
                     break;
             }
+
             ProcessResult(IN.payload);
         });
-       
-       await SOK.ConnectAsync(CancellationToken.None);
+
+        await SOK.ConnectAsync(CancellationToken.None);
     }
 
     private async void SetupAudio()
@@ -179,9 +182,11 @@ public partial class Scanner : ContentPage
                     switch (PayloadType)
                     {
                         case "object":
-                            Payload = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(Payload.ToString());
+                            Payload =
+                                Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(
+                                    Payload.ToString());
                             break;
-                        
+
                         default:
                             Payload = Payload.ToString();
                             break;
@@ -217,12 +222,14 @@ public partial class Scanner : ContentPage
                                                 Text = KEY.StartsWith("_") ? e.BarcodeResults.First().RawValue : "",
                                                 BackgroundColor = Colors.LightGrey, PlaceholderColor = Colors.Gray,
                                                 Placeholder = KEY,
-                                                Keyboard = Layout[KEY].Equals("number") ? Keyboard.Numeric : Keyboard.Text
+                                                Keyboard = Layout[KEY].Equals("number")
+                                                    ? Keyboard.Numeric
+                                                    : Keyboard.Text
                                             },
                                         }
                                     });
                                 }
-                                else  if (Layout[KEY].Equals("ml_string"))
+                                else if (Layout[KEY].Equals("ml_string"))
                                 {
                                     C._ContentPH.Add(new VerticalStackLayout
                                     {
@@ -241,46 +248,46 @@ public partial class Scanner : ContentPage
                                         }
                                     });
                                 }
-                                
+
                             }
 
-                            var  R = await this.ShowPopupAsync(C);
-                            if(!((bool)R))
+                            var R = await this.ShowPopupAsync(C);
+                            if (!((bool)R))
                             {
                                 EnableCamera(true);
                                 return;
                             }
-                          
+
                             List<Entry> Entries = C._ContentPH.GetDescendantsOfType<Entry>().ToList();
                             List<Editor> Editors = C._ContentPH.GetDescendantsOfType<Editor>().ToList();
 
                             Dictionary<string, object> ItemPL = new Dictionary<string, object>();
                             long unixTimeMillis = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                             ItemPL.Add("timestamp", unixTimeMillis);
-                            
+
                             Dictionary<string, object> Scanner = new Dictionary<string, object>();
                             Scanner.Add("id", MauiProgram._Enrollment.ClientID);
                             Scanner.Add("name", MauiProgram._Enrollment.ClientLabel);
                             Scanner.Add("appVersion", AppInfo.Current.Version.ToString());
                             ItemPL.Add("scanner", Scanner);
-                            
+
                             Dictionary<string, object> Item = new Dictionary<string, object>();
-                            foreach (Entry E in Entries) 
+                            foreach (Entry E in Entries)
                             {
                                 if (E.ClassId != null && E.Text.Length > 0)
                                 {
                                     Item.Add(E.ClassId, E.Keyboard == Keyboard.Numeric ? int.Parse(E.Text) : E.Text);
                                 }
                             }
-                            
-                            foreach (Editor E in Editors) 
+
+                            foreach (Editor E in Editors)
                             {
                                 if (E.ClassId != null && E.Text.Length > 0)
                                 {
                                     Item.Add(E.ClassId, E.Text);
                                 }
                             }
-                            
+
                             ItemPL.Add("item", Item);
 
                             SOK.EmitAsync("BARRED.Item", ItemPL).ContinueWith((t) =>
@@ -311,9 +318,11 @@ public partial class Scanner : ContentPage
     }
 
 
-private async void Button_OnClicked(object? sender, EventArgs e)
+    private async void Button_OnClicked(object? sender, EventArgs e)
     {
-        bool Yes = await DisplayAlert("Delete Registration?", "Are you sure, you wish to delete the registration? Doing so will put the scanner in a state of 'Un-enrolled'", "Yes", "No");
+        bool Yes = await DisplayAlert("Delete Registration?",
+            "Are you sure, you wish to delete the registration? Doing so will put the scanner in a state of 'Un-enrolled'",
+            "Yes", "No");
         if (Yes)
         {
             Microsoft.Maui.Storage.Preferences.Remove("Enrollment");

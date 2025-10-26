@@ -19,13 +19,17 @@ public partial class Scanner : ContentPage
     private static IAudioPlayer AM_OK;
     private static IAudioPlayer AM_ERROR;
     private static IAudioPlayer AM_PROMPT;
-    private static IAudioPlayer AM_WAIT;
 
     protected override void OnDisappearing()
     {
         ScannerEl.CameraEnabled = false;
         ScannerEl.PauseScanning = true;
         base.OnDisappearing();
+    }
+
+    private void EnableCamera(bool enable)
+    {
+        MainThread.BeginInvokeOnMainThread(() => { ScannerEl.CameraEnabled = enable; });
     }
 
     private void ProcessResult(object Obj)
@@ -138,7 +142,6 @@ public partial class Scanner : ContentPage
         AM_OK = AM.CreatePlayer(await FileSystem.OpenAppPackageFileAsync("OK.mp3"));
         AM_ERROR = AM.CreatePlayer(await FileSystem.OpenAppPackageFileAsync("ERROR.mp3"));
         AM_PROMPT = AM.CreatePlayer(await FileSystem.OpenAppPackageFileAsync("PROMPT.mp3"));
-        //AM_WAIT = AM.CreatePlayer(await FileSystem.OpenAppPackageFileAsync("WAIT.mp3"));
     }
 
     private void ScannerEl_OnOnDetectionFinished(object? sender, OnDetectionFinishedEventArg e)
@@ -193,7 +196,7 @@ public partial class Scanner : ContentPage
 
                     if (Status == "CREATE")
                     {
-                        ScannerEl.CameraEnabled = false;
+                        EnableCamera(false);
                         MainThread.BeginInvokeOnMainThread(async () =>
                         {
                             Create C = new Create();
@@ -244,7 +247,7 @@ public partial class Scanner : ContentPage
                             var  R = await this.ShowPopupAsync(C);
                             if(!((bool)R))
                             {
-                                ScannerEl.CameraEnabled = true;
+                                EnableCamera(true);
                                 return;
                             }
                           
@@ -282,12 +285,9 @@ public partial class Scanner : ContentPage
 
                             SOK.EmitAsync("BARRED.Item", ItemPL).ContinueWith((t) =>
                             {
-                                ScannerEl.CameraEnabled = true;
+                                EnableCamera(true);
                                 ProcessResult($"Item Data Sent for Barcode, scan again to confirm if required.");
                             });
-                            
-                          
-
                         });
                     }
                     else

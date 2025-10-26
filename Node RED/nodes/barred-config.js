@@ -26,6 +26,23 @@ module.exports = function (RED) {
 			delete itemEmitters[id];
 		};
 
+		self.sendToScanner = (id, payload) => {
+			const PL = {
+				payloadType: typeof payload,
+				payload: payload
+			};
+
+			if (id) {
+				if (connectedScanners[id]) {
+					connectedScanners[id].emit('BARRED.Prompt', PL);
+				}
+			} else {
+				Object.values(connectedScanners).forEach((S) => {
+					S.emit('BARRED.Prompt', PL);
+				});
+			}
+		};
+
 		const ioOptions = {
 			path: `/barred-${self.id}/`,
 			origin: '*',
@@ -43,7 +60,7 @@ module.exports = function (RED) {
 		});
 
 		self.io.on('connection', (scanner) => {
-			connectedScanners[scanner.id] = scanner;
+			connectedScanners[scanner.handshake.auth.id] = scanner;
 
 			scanner.on('BARRED.Item', (args) => {
 				const msg = {
@@ -74,7 +91,7 @@ module.exports = function (RED) {
 			});
 
 			scanner.on('disconnect', () => {
-				delete connectedScanners[scanner.id];
+				delete connectedScanners[scanner.handshake.auth.id];
 			});
 		});
 

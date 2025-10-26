@@ -9,6 +9,7 @@ using Plugin.Maui.Audio;
 using SocketIOClient;
 using CommunityToolkit.Maui.Views;
 
+
 namespace Barred_Client;
 
 public partial class Scanner : ContentPage
@@ -41,7 +42,7 @@ public partial class Scanner : ContentPage
             {
                 Text = "\n--------------------------\n\n"
             });
-
+            
             if (typeof(string) == Obj.GetType())
             {
                 Status.FormattedText.Spans.Add(new Span
@@ -88,6 +89,9 @@ public partial class Scanner : ContentPage
         ProcessResult("Connecting to Stack...");
         SocketIOOptions Ops = new SocketIOOptions();
         Ops.Path = MauiProgram._Enrollment.Namespace;
+        Ops.Reconnection = true;
+        Ops.ReconnectionAttempts = 30;
+        Ops.ReconnectionDelay = 2000;
         Dictionary<string, object> Auth = new Dictionary<string, object>();
         Auth.Add("id", MauiProgram._Enrollment.ClientID);
         Ops.Auth = Auth;
@@ -108,7 +112,25 @@ public partial class Scanner : ContentPage
             AM_OK.Play();
             ProcessResult("Scanner Ready!");
         };
-        await SOK.ConnectAsync(CancellationToken.None);
+        SOK.On("BARRED.Prompt", (E) =>
+        {
+            AM_PROMPT.Play();
+            Prompt IN = E.GetValue<Prompt>();
+
+            switch (IN.payloadType)
+            {
+                case "object":
+                    IN.payload = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(IN.payload.ToString());
+                    break;
+                
+                default:
+                    IN.payload = IN.payload.ToString();
+                    break;
+            }
+            ProcessResult(IN.payload);
+        });
+       
+       await SOK.ConnectAsync(CancellationToken.None);
     }
 
     private async void SetupAudio()
@@ -153,12 +175,12 @@ public partial class Scanner : ContentPage
 
                     switch (PayloadType)
                     {
-                        case "string":
-                            Payload = Payload.ToString();
-                            break;
-
                         case "object":
                             Payload = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(Payload.ToString());
+                            break;
+                        
+                        default:
+                            Payload = Payload.ToString();
                             break;
                     }
 
@@ -171,6 +193,7 @@ public partial class Scanner : ContentPage
 
                     if (Status == "CREATE")
                     {
+                        ScannerEl.CameraEnabled = false;
                         MainThread.BeginInvokeOnMainThread(async () =>
                         {
                             Create C = new Create();
@@ -221,6 +244,7 @@ public partial class Scanner : ContentPage
                             var  R = await this.ShowPopupAsync(C);
                             if(!((bool)R))
                             {
+                                ScannerEl.CameraEnabled = true;
                                 return;
                             }
                           
@@ -240,7 +264,7 @@ public partial class Scanner : ContentPage
                             Dictionary<string, object> Item = new Dictionary<string, object>();
                             foreach (Entry E in Entries) 
                             {
-                                if (E.ClassId != null)
+                                if (E.ClassId != null && E.Text.Length > 0)
                                 {
                                     Item.Add(E.ClassId, E.Keyboard == Keyboard.Numeric ? int.Parse(E.Text) : E.Text);
                                 }
@@ -248,7 +272,7 @@ public partial class Scanner : ContentPage
                             
                             foreach (Editor E in Editors) 
                             {
-                                if (E.ClassId != null)
+                                if (E.ClassId != null && E.Text.Length > 0)
                                 {
                                     Item.Add(E.ClassId, E.Text);
                                 }
@@ -258,6 +282,7 @@ public partial class Scanner : ContentPage
 
                             SOK.EmitAsync("BARRED.Item", ItemPL).ContinueWith((t) =>
                             {
+                                ScannerEl.CameraEnabled = true;
                                 ProcessResult($"Item Data Sent for Barcode, scan again to confirm if required.");
                             });
                             

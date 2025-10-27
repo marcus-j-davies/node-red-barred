@@ -66,6 +66,12 @@ The scanner UI, can be controlled by the Configuration Node.
 
  You enrol scanners via a QR Code - which is generated via the Configuration Node.  
 
+## To do
+
+ - Allow rich content in responses / items.
+ - Allow for deeper Object formatting.  
+   Currently nested objects on the scanner, are not formatted  
+
 ## Acknowledgements
 
 [Dynamic Dave - Node RED Community member](https://discourse.nodered.org/u/dynamicdave/summary) - For helping me test  

@@ -40,7 +40,9 @@ Currently, the supported barcode symbologies are:
 
 ## Scanner Prompt Node
 
-The `Scanner Prompt` Node allows you to send a message or object - without the need for a scanner to first present a scan, this for example, can allow you to notify scanners at any point, it can send a message to 1 or many scanners.
+The `Scanner Prompt` Node allows you to send a message or object - without the need for a scanner to first present a scan, this for example, can allow you to notify scanners at any point, it can send a message to 1 or many scanners, or maybe you want to return something back to the scanner, that provided some info, following its initial scan.  
+
+Thats the point here - use the tookit in a way that works for you.
 
 ## Built in Flow example
 

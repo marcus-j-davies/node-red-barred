@@ -42,6 +42,10 @@ Currently, the supported barcode symbologies are:
 
 The `Scanner Prompt` Node allows you to send a message or object - without the need for a scanner to first present a scan, this for example, can allow you to notify scanners at any point, it can send a message to 1 or many scanners.
 
+## Built in Flow example
+
+The Node collection, includes an example Node RED flow - Just modify the Config to suite and Deploy.
+
 ## Scanner Enrollment / Branding
 
 The scanner UI, can be controlled by the Configuration Node.

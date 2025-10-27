@@ -17,7 +17,7 @@
 			return this.name;
 		},
 		oneditprepare: SortUI,
-		oneditsave: SaveScanners
+		oneditsave: SaveSettings
 	});
 
 	function getHost() {
@@ -144,13 +144,29 @@
 			});
 	}
 
-	function SaveScanners() {
+	function MarkDirty() {
+		RED.nodes.dirty(EditingBarredConfig);
+	}
+
+	async function SaveSettings() {
 		const Scanners = $('#scanners').editableList('items');
 		this.scanners = {};
 		for (let i = 0; i < Scanners.length; i++) {
 			const ScannerData = Scanners[i].data('data');
 			this.scanners[ScannerData.scannerId] = ScannerData;
 		}
+
+		const file = $('#node-config-input-logo')[0].files[0];
+		if (!file) return;
+		const response = await fetch(`barred-api/seticon/${EditingBarredConfig}`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'image/png'
+			},
+			body: file
+		});
+
+		return;
 	}
 
 	function SortUI() {
@@ -178,24 +194,6 @@
 			$('#scanners').editableList('addItem', S);
 		});
 	}
-
-	async function UploadPNG(Input) {
-		const file = Input.files[0];
-		if (!file) return;
-		const response = await fetch(`barred-api/seticon/${EditingBarredConfig}`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'image/png'
-			},
-			body: file
-		});
-
-		if (!response.ok) {
-			alert(await response.text());
-		} else {
-			alert('PNG Uploaded to Node RED for');
-		}
-	}
 </script>
 
 <!-- prettier-ignore -->
@@ -220,7 +218,7 @@
 	</div>
     <div class="form-row">
 	    <label for="node-config-input-logo"><i class="fa fa-picture-o"></i> Logo</label>
-	    <input type="file" accept="image/png" onchange="UploadPNG(this)">
+	    <input id="node-config-input-logo" type="file" accept="image/png" onchange="MarkDirty()">
 	</div>
 
 	<h3>Settings</h3>

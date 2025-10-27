@@ -69,6 +69,7 @@ The scanner UI, can be controlled by the Configuration Node.
 ## To do
 
  - Allow rich content in responses / items.
+ - Add dropdown (select) to allowed list of input types for info  request
  - Allow for deeper Object formatting.  
    Currently nested objects on the scanner, are not formatted  
 

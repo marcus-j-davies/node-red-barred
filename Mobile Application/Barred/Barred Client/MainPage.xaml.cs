@@ -1,5 +1,6 @@
 ﻿namespace Barred_Client;
 using CommunityToolkit.Maui.Views;
+using BarcodeScanning;
 
 public partial class MainPage : ContentPage
 {
@@ -19,6 +20,7 @@ public partial class MainPage : ContentPage
 
     private async void StartEnrollemnt(object? sender, EventArgs e)
     {
+        await Methods.AskForRequiredPermissionAsync();
         await Shell.Current.GoToAsync("Enrol");
     }
 

@@ -37,6 +37,11 @@
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <AndroidSupportedAbis>armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
+      <AndroidPackageFormat>apk</AndroidPackageFormat>
+    </PropertyGroup>
     
     <ItemGroup>
         <!-- App Icon -->

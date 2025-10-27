@@ -1,6 +1,30 @@
 # Node RED BARRED
 The Node RED Barcode Processing Platform
 
+## Say what!?
+Node RED BARRED, is a barcode Processing toolkit, with no bias towards any specifc target.  
+This toolkit includes 2 main components
+
+- The set of Node RED Nodes 
+  - `Incoming Barcode`
+  - `Send Result`
+  - `Incoming Item`
+  - `Scanner Prompt`
+
+- A native mobile Client, that does the scanning, the mobile application is developed in .NET MAUI.  
+  The barcode decoding is `on-device`, so the performance is only limited by the mobile platform. 
+
+Currently, the supported barcode symbologies are:
+
+ - iOS
+   - **1D**: Codabar, Code 39, Code 93, Code 128, EAN-8, EAN-13, GS1 DataBar, ITF, UPC-A, UPC-E;
+   - **2D**: Aztec, Data Matrix, MicroPDF417, MicroQR, PDF417, QR Code
+
+- Android
+   - **1D**: Codabar, Code 39, Code 93, Code 128, EAN-8, EAN-13, ITF, UPC-A, UPC-E;
+   - **2D**: Aztec, Data Matrix, PDF417, QR Code
+     
+
 ## Native App Build Environment
 
  - Android DK 15 (35)
@@ -9,6 +33,26 @@ The Node RED Barcode Processing Platform
  - xCode 16.4
  - Rider 2025.2.3
  - MacOS 26
+
+## The Usage Flow
+
+![Image](./Node%20RED/Images/flow.png)
+
+## Scanner Prompt Node
+
+The `Scanner Prompt` Node allows you to send a message or object - without the need for a scanner to first present a scan, this for example, can allow you to notify scanners at any point, it can send a mesage to 1 or many scanners.
+
+## Scanner Enrollment / Branding
+
+The scanner UI, can be controlled by the Configuration Node.
+
+ - Department Name
+ - Color Theme
+ - Scanner name (per Scanner)
+
+ You enrol scanners via a QR Code - which is generated via the Configuration Node.  
+
+
 
 ## License
 MIT License

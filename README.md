@@ -44,7 +44,11 @@ The `Send Item` Node allows you to send a message or object - without the need f
 
 ![Image](./Images/Send.png)
 
-Thats the point here - use the tookit in a way that works for you.
+Thats the point here - use the tookit in a way that works for you - And yes, it suppports emojis in a message.
+
+![Image](./Images/Emoji.png)
+
+
 
 ## Built in Flow example
 

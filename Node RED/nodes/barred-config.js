@@ -107,14 +107,45 @@ module.exports = function (RED) {
 		response.json({ version: require('../package.json').version });
 	});
 
-	RED.httpAdmin.get('/barred-api/geticon/:instanceid', (request, response) => {});
+	RED.httpAdmin.get('/barred-api/geticon/:instanceid', (request, response) => {
+		const File = 'icon.png';
+		const Root = path.join(RED.settings.userDir || '', 'barred', request.params.instanceid);
+
+		response.setHeader('Content-Type', 'image/png');
+		if (fs.existsSync(path.join(Root, File))) {
+			response.sendFile(path.join(Root, File));
+		} else {
+			response.sendFile(path.join(__dirname, '../', 'resources', 'node_red_icon.png'));
+		}
+	});
 	RED.httpAdmin.post('/barred-api/seticon/:instanceid', (request, response) => {
+		const File = 'icon.png';
 		const Root = path.join(RED.settings.userDir || '', 'barred', request.params.instanceid);
 
 		if (!fs.existsSync(Root)) {
 			fs.mkdirSync(Root, { recursive: true });
 		}
 
-		response.status(200).send({ message: 'Directory ready' });
+		const chunks = [];
+		request.on('data', (chunk) => {
+			chunks.push(chunk);
+		});
+
+		request.on('end', () => {
+			const buffer = Buffer.concat(chunks);
+
+			if (buffer.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a') {
+				response.status(400).send('Invalid PNG file');
+				return;
+			}
+
+			fs.writeFile(path.join(Root, File), buffer, (err) => {
+				if (err) {
+					response.status(500).send('Failed to save file');
+				} else {
+					response.status(200).send('Icon saved successfully');
+				}
+			});
+		});
 	});
 };

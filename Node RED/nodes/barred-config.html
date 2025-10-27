@@ -21,7 +21,7 @@
 	});
 
 	function getHost() {
-		return window.location.hostname;
+		return window.location;
 	}
 
 	function genPort() {
@@ -60,7 +60,7 @@
 			ScanRate: Number($('#node-config-input-rate').val()),
 			Theme: {
 				Color: $('#node-config-input-color').val(),
-				IconURL: `http://${$('#node-config-input-host').val()}:${$('#node-config-input-port').val()}/barred-api/geticon/${EditingBarredConfig}`
+				IconURL: `http://${$('#node-config-input-host').val()}:${getHost().port}/barred-api/geticon/${EditingBarredConfig}`
 			},
 			ClientID: $(`#scanner_${Index}_id`).val(),
 			ClientLabel: $(`#scanner_${Index}_name`).val()
@@ -157,14 +157,13 @@
 		EditingBarredConfig = this.id;
 
 		if (!this.host) {
-			this.host = getHost();
-			$('#node-config-input-host').val(this.host)
-
+			this.host = getHost().hostname;
+			$('#node-config-input-host').val(this.host);
 		}
 
 		if (!this.port) {
 			this.port = genPort();
-			$('#node-config-input-port').val(this.port)
+			$('#node-config-input-port').val(this.port);
 		}
 
 		$('#scanners').editableList({
@@ -178,6 +177,24 @@
 			console.log(S);
 			$('#scanners').editableList('addItem', S);
 		});
+	}
+
+	async function UploadPNG(Input) {
+		const file = Input.files[0];
+		if (!file) return;
+		const response = await fetch(`barred-api/seticon/${EditingBarredConfig}`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'image/png'
+			},
+			body: file
+		});
+
+		if (!response.ok) {
+			alert(await response.text());
+		} else {
+			alert('PNG Uploaded to Node RED for');
+		}
 	}
 </script>
 
@@ -203,7 +220,7 @@
 	</div>
     <div class="form-row">
 	    <label for="node-config-input-logo"><i class="fa fa-picture-o"></i> Logo</label>
-	    <input type="file" accept="image/png">
+	    <input type="file" accept="image/png" onchange="UploadPNG(this)">
 	</div>
 
 	<h3>Settings</h3>

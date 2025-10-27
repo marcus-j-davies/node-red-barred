@@ -25,7 +25,8 @@
                 Aspect="AspectFit"
                 Grid.Column="0"
                 Source="node_red_icon.png"
-                WidthRequest="60" />
+                WidthRequest="120"
+                x:Name="IMG_Icon" />
             <Label
                 FontSize="24"
                 Grid.Column="1"

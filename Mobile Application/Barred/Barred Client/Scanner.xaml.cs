@@ -115,6 +115,15 @@ public partial class Scanner : ContentPage
         {
             AM_OK.Play();
             ProcessResult("Scanner Ready!");
+
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                IMG_Icon.Source = new UriImageSource
+                {
+                    Uri = new Uri(MauiProgram._Enrollment.Theme.IconURL),
+                    CachingEnabled = false
+                };
+            });
         };
         SOK.On("BARRED.Prompt", (E) =>
         {

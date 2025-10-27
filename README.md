@@ -36,7 +36,7 @@ Currently, the supported barcode symbologies are:
 
 ## The Usage Flow
 
-![Image](./Node%20RED/Images/flow.png)
+![Image](./Images/flow.png)
 
 ## Scanner Prompt Node
 

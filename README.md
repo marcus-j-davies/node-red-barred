@@ -2,7 +2,7 @@
 The Node RED Barcode Processing Platform
 
 ## Say what!?
-Node RED BARRED, is a barcode Processing toolkit, with no bias towards any specifc target.  
+Node RED BARRED, is a Barcode Processing toolkit, with no bias towards any specific target.  
 This toolkit includes 2 main components
 
 - The set of Node RED Nodes 
@@ -11,7 +11,7 @@ This toolkit includes 2 main components
   - `Incoming Item`
   - `Scanner Prompt`
 
-- A native mobile Client, that does the scanning, the mobile application is developed in .NET MAUI.  
+- A native Mobile Client, that does the scanning, the mobile application is developed in .NET MAUI.  
   The barcode decoding is `on-device`, so the performance is only limited by the mobile platform. 
 
 Currently, the supported barcode symbologies are:
@@ -40,7 +40,7 @@ Currently, the supported barcode symbologies are:
 
 ## Scanner Prompt Node
 
-The `Scanner Prompt` Node allows you to send a message or object - without the need for a scanner to first present a scan, this for example, can allow you to notify scanners at any point, it can send a mesage to 1 or many scanners.
+The `Scanner Prompt` Node allows you to send a message or object - without the need for a scanner to first present a scan, this for example, can allow you to notify scanners at any point, it can send a message to 1 or many scanners.
 
 ## Scanner Enrollment / Branding
 
@@ -49,6 +49,7 @@ The scanner UI, can be controlled by the Configuration Node.
  - Department Name
  - Color Theme
  - Scanner name (per Scanner)
+ - Scan Rates & timeouts
 
  You enrol scanners via a QR Code - which is generated via the Configuration Node.  
 

@@ -51,6 +51,7 @@ The Node collection, includes an example Node RED flow - Just modify the Config 
 The scanner UI, can be controlled by the Configuration Node.
 
  - Department Name
+ - UI Icon
  - Color Theme
  - Scanner name (per Scanner)
  - Scan Rates & timeouts

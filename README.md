@@ -9,7 +9,7 @@ This toolkit includes 2 main components
   - `Incoming Barcode`
   - `Send Result`
   - `Incoming Item`
-  - `Scanner Prompt`
+  - `Send Item`
 
 - A native Mobile Client, that does the scanning, the mobile application is developed in .NET MAUI.  
   The barcode decoding is `on-device`, so the performance is only limited by the mobile platform. 

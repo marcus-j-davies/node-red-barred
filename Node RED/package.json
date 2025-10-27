@@ -8,7 +8,9 @@
 		"barcode",
 		"qr",
 		"code",
-		"scanner"
+		"scanner",
+		"maui",
+		"native"
 	],
 	"dependencies": {
 		"socket.io": "4.8.1"

@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 using BarcodeScanning;
 using Plugin.Maui.Audio;
 using SocketIOClient;
@@ -19,14 +13,37 @@ public partial class Scanner : ContentPage
     private static IAudioPlayer AM_OK;
     private static IAudioPlayer AM_ERROR;
     private static IAudioPlayer AM_PROMPT;
-
+    
+    public Scanner(IAudioManager AudioManager)
+    {
+        InitializeComponent();
+        AM = AudioManager;
+        SetupAudio();
+        SetupConnection();
+    }
+    
     protected override void OnDisappearing()
     {
         ScannerEl.CameraEnabled = false;
         ScannerEl.PauseScanning = true;
         base.OnDisappearing();
     }
+    
+    private async void SetupAudio()
+    {
+        AM_OK = AM.CreatePlayer(await FileSystem.OpenAppPackageFileAsync("OK.mp3"));
+        AM_ERROR = AM.CreatePlayer(await FileSystem.OpenAppPackageFileAsync("ERROR.mp3"));
+        AM_PROMPT = AM.CreatePlayer(await FileSystem.OpenAppPackageFileAsync("PROMPT.mp3"));
+    }
 
+    private void PlayAudio(IAudioPlayer Player)
+    {
+        if (AudioSwitch.IsToggled)
+        {
+            Player.Play();
+        }
+    }
+    
     private void EnableCamera(bool enable)
     {
         MainThread.BeginInvokeOnMainThread(() => { ScannerEl.CameraEnabled = enable; });
@@ -79,15 +96,7 @@ public partial class Scanner : ContentPage
             }
         });
     }
-
-    public Scanner(IAudioManager AudioManager)
-    {
-        InitializeComponent();
-        AM = AudioManager;
-        SetupAudio();
-        SetupConnection();
-    }
-
+    
     private async void SetupConnection()
     {
         ProcessResult("Connecting to Stack...");
@@ -103,17 +112,17 @@ public partial class Scanner : ContentPage
         SOK = new SocketIOClient.SocketIO(MauiProgram._Enrollment.StackEndpoint, Ops);
         SOK.OnError += (sender, s) =>
         {
-            AM_ERROR.Play();
+            PlayAudio(AM_ERROR);
             ProcessResult($"ERROR: {s}");
         };
         SOK.OnDisconnected += (sender, s) =>
         {
-            AM_ERROR.Play();
+            PlayAudio(AM_ERROR);
             ProcessResult("Lost connection to the Stack");
         };
         SOK.OnConnected += (sender, args) =>
         {
-            AM_OK.Play();
+            PlayAudio(AM_OK);
             ProcessResult("Scanner Ready!");
 
             MainThread.BeginInvokeOnMainThread(() =>
@@ -127,9 +136,9 @@ public partial class Scanner : ContentPage
         };
         SOK.On("BARRED.Prompt", (E) =>
         {
-            AM_PROMPT.Play();
+            PlayAudio(AM_PROMPT);
+            
             Prompt IN = E.GetValue<Prompt>();
-
             switch (IN.payloadType)
             {
                 case "object":
@@ -148,14 +157,7 @@ public partial class Scanner : ContentPage
 
         await SOK.ConnectAsync(CancellationToken.None);
     }
-
-    private async void SetupAudio()
-    {
-        AM_OK = AM.CreatePlayer(await FileSystem.OpenAppPackageFileAsync("OK.mp3"));
-        AM_ERROR = AM.CreatePlayer(await FileSystem.OpenAppPackageFileAsync("ERROR.mp3"));
-        AM_PROMPT = AM.CreatePlayer(await FileSystem.OpenAppPackageFileAsync("PROMPT.mp3"));
-    }
-
+    
     private void ScannerEl_OnOnDetectionFinished(object? sender, OnDetectionFinishedEventArg e)
     {
         if (SOK.Connected)
@@ -201,13 +203,10 @@ public partial class Scanner : ContentPage
                             break;
                     }
 
-                    if (AudioSwitch.IsToggled)
-                    {
-                        if (Status == "ERROR") AM_ERROR.Play();
-                        else if (Status == "OK") AM_OK.Play();
-                        else if (Status == "CREATE") AM_PROMPT.Play();
-                    }
-
+                    if (Status == "ERROR") PlayAudio(AM_ERROR);
+                    else if (Status == "OK") PlayAudio(AM_OK);
+                    else if (Status == "CREATE") PlayAudio(AM_PROMPT);
+                    
                     if (Status == "CREATE")
                     {
                         EnableCamera(false);
@@ -325,8 +324,7 @@ public partial class Scanner : ContentPage
             }
         }
     }
-
-
+    
     private async void Button_OnClicked(object? sender, EventArgs e)
     {
         bool Yes = await DisplayAlert("Delete Registration?",

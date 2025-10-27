@@ -36,17 +36,17 @@ Currently, the supported barcode symbologies are:
 
 ## The Usage Flow
 
-![Image](../Images/flow.png)
+![Image](./Images/flow.png)
 
 ## Send Item Node
 
 The `Send Item` Node allows you to send a message or object - without the need for a scanner to first present a scan, this for example, can allow you to notify scanners at any point, it can send a message to 1 or many scanners, or maybe you want to return something back to the scanner, that provided some info, following its initial scan.  
 
-![Image](../Images/Send.png)
+![Image](./Images/Send.png)
 
 Thats the point here - use the tookit in a way that works for you - And yes, it suppports emojis in a message.
 
-![Image](../Images/Emoji.png)
+![Image](./Images/Emoji.png)
 
 
 

@@ -53,6 +53,11 @@ The scanner UI, can be controlled by the Configuration Node.
 
  You enrol scanners via a QR Code - which is generated via the Configuration Node.  
 
+## Acknowledgements
+
+[Dynamic Dave - Node RED Community member](https://discourse.nodered.org/u/dynamicdave/summary) - For helping me test  
+[Afriscic](https://github.com/afriscic) - For the Native Barcode Decoding lib
+
 
 
 ## License

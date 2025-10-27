@@ -1,5 +1,5 @@
 module.exports = function (RED) {
-	function BarredPrompt(config) {
+	function SendItem(config) {
 		RED.nodes.createNode(this, config);
 		const self = this;
 
@@ -13,5 +13,5 @@ module.exports = function (RED) {
 		});
 	}
 
-	RED.nodes.registerType('barred-prompt', BarredPrompt);
+	RED.nodes.registerType('barred-send-item', SendItem);
 };

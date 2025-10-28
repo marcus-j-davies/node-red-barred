@@ -114,13 +114,31 @@
             ColumnDefinitions="Auto,*,Auto"
             ColumnSpacing="15"
             Grid.Row="4">
+            <StackLayout
+                Grid.Column="0"
+                HorizontalOptions="Center"
+                Orientation="Horizontal"
+                Spacing="6">
+                <Button
+                    BackgroundColor="Red"
+                    Clicked="Button_Delete"
+                    FontSize="20"
+                    Text="D" />
+                <Button
+                    BackgroundColor="{x:Static program:MauiProgram.ThemeColor}"
+                    Clicked="Button_Menu"
+                    FontSize="20"
+                    Text="M" />
+            </StackLayout>
+
+            <!--
             <Button
                 BackgroundColor="{x:Static program:MauiProgram.ThemeColor}"
                 Clicked="Button_OnClicked"
                 FontSize="20"
                 Grid.Column="0"
                 HorizontalOptions="Center"
-                Text="Delete En" />
+                Text="Delete En" />-->
             <Label
                 Grid.Column="1"
                 HorizontalOptions="Center"

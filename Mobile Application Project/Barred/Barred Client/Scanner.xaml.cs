@@ -13,7 +13,7 @@ public partial class Scanner : ContentPage
     private static IAudioPlayer AM_OK;
     private static IAudioPlayer AM_ERROR;
     private static IAudioPlayer AM_PROMPT;
-    
+
     public Scanner(IAudioManager AudioManager)
     {
         InitializeComponent();
@@ -21,14 +21,17 @@ public partial class Scanner : ContentPage
         SetupAudio();
         SetupConnection();
     }
-    
+
     protected override void OnDisappearing()
     {
         ScannerEl.CameraEnabled = false;
         ScannerEl.PauseScanning = true;
+        SOK.DisconnectAsync();
+        SOK.Dispose();
+        SOK = null;
         base.OnDisappearing();
     }
-    
+
     private async void SetupAudio()
     {
         AM_OK = AM.CreatePlayer(await FileSystem.OpenAppPackageFileAsync("OK.mp3"));
@@ -43,7 +46,7 @@ public partial class Scanner : ContentPage
             Player.Play();
         }
     }
-    
+
     private void EnableCamera(bool enable)
     {
         MainThread.BeginInvokeOnMainThread(() => { ScannerEl.CameraEnabled = enable; });
@@ -96,7 +99,7 @@ public partial class Scanner : ContentPage
             }
         });
     }
-    
+
     private async void SetupConnection()
     {
         ProcessResult("Connecting to Stack...");
@@ -105,8 +108,10 @@ public partial class Scanner : ContentPage
         Ops.Reconnection = true;
         Ops.ReconnectionAttempts = 30;
         Ops.ReconnectionDelay = 2000;
-        Dictionary<string, object> Auth = new Dictionary<string, object>();
-        Auth.Add("id", MauiProgram._Enrollment.ClientID);
+        Dictionary<string, object> Auth = new Dictionary<string, object>
+        {
+            { "id", MauiProgram._Enrollment.ClientID },
+        };
         Ops.Auth = Auth;
 
         SOK = new SocketIOClient.SocketIO(MauiProgram._Enrollment.StackEndpoint, Ops);
@@ -137,7 +142,7 @@ public partial class Scanner : ContentPage
         SOK.On("BARRED.Prompt", (E) =>
         {
             PlayAudio(AM_PROMPT);
-            
+
             Prompt IN = E.GetValue<Prompt>();
             switch (IN.payloadType)
             {
@@ -157,7 +162,144 @@ public partial class Scanner : ContentPage
 
         await SOK.ConnectAsync(CancellationToken.None);
     }
-    
+
+    private async Task HandleCreateResponseAsync(Dictionary<string, object> layout, string scannedItem)
+    {
+        EnableCamera(false);
+        await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            Create C = new Create();
+
+            foreach (string key in layout.Keys)
+            {
+                object value = layout[key];
+
+                if (value.Equals("string") || value.Equals("number"))
+                {
+                    C._ContentPH.Add(new VerticalStackLayout
+                    {
+                        Spacing = 8.0,
+                        Children =
+                        {
+                            new Entry
+                            {
+                                IsReadOnly = key.StartsWith("_"),
+                                ClassId = key.StartsWith("_") ? key.Substring(1) : key,
+                                Text = key.StartsWith("_") ? scannedItem : "",
+                                BackgroundColor = Colors.LightGrey,
+                                PlaceholderColor = Colors.Gray,
+                                Placeholder = key,
+                                Keyboard = value.Equals("number") ? Keyboard.Numeric : Keyboard.Text
+                            },
+                        }
+                    });
+                }
+                else if (value.Equals("ml_string"))
+                {
+                    C._ContentPH.Add(new VerticalStackLayout
+                    {
+                        Spacing = 8.0,
+                        Children =
+                        {
+                            new Editor
+                            {
+                                IsReadOnly = key.StartsWith("_"),
+                                ClassId = key.StartsWith("_") ? key.Substring(1) : key,
+                                Text = key.StartsWith("_") ? scannedItem : "",
+                                BackgroundColor = Colors.LightGrey,
+                                PlaceholderColor = Colors.Gray,
+                                Placeholder = key,
+                                Keyboard = Keyboard.Text
+                            },
+                        }
+                    });
+                }
+            }
+
+            var popupResult = await this.ShowPopupAsync(C);
+            if (!((bool)popupResult))
+            {
+                EnableCamera(true);
+                return;
+            }
+
+            List<Entry> entries = C._ContentPH.GetDescendantsOfType<Entry>().ToList();
+            List<Editor> editors = C._ContentPH.GetDescendantsOfType<Editor>().ToList();
+
+            Dictionary<string, object> itemPayload = new Dictionary<string, object>();
+            long unixTimeMillis = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            itemPayload.Add("timestamp", unixTimeMillis);
+
+            Dictionary<string, object> scanner = new Dictionary<string, object>
+            {
+                { "id", MauiProgram._Enrollment.ClientID },
+                { "name", MauiProgram._Enrollment.ClientLabel },
+                { "appVersion", AppInfo.Current.Version.ToString() }
+            };
+            itemPayload.Add("scanner", scanner);
+
+            Dictionary<string, object> item = new Dictionary<string, object>();
+            foreach (Entry e in entries)
+            {
+                if (e.ClassId != null && e.Text.Length > 0)
+                {
+                    item.Add(e.ClassId, e.Keyboard == Keyboard.Numeric ? int.Parse(e.Text) : e.Text);
+                }
+            }
+
+            foreach (Editor ed in editors)
+            {
+                if (ed.ClassId != null && ed.Text.Length > 0)
+                {
+                    item.Add(ed.ClassId, ed.Text);
+                }
+            }
+
+            itemPayload.Add("item", item);
+
+            await SOK.EmitAsync("BARRED.Item", itemPayload);
+            EnableCamera(true);
+            ProcessResult($"Item Data Sent for Barcode: {scannedItem}, scan again to confirm if required.");
+        });
+    }
+
+    private void HandleBarcodeResponse(SocketIOResponse response, OnDetectionFinishedEventArg e)
+    {
+        BarcodeResponse Res = response.GetValue<BarcodeResponse>(0);
+        string Status = Res.status;
+        string PayloadType = Res.payloadType;
+        object Payload = Res.payload;
+
+        if (Status == "ERROR") PlayAudio(AM_ERROR);
+        else if (Status == "OK") PlayAudio(AM_OK);
+        else if (Status == "CREATE") PlayAudio(AM_PROMPT);
+
+        if (Status == "CREATE")
+        {
+            Dictionary<string, object> Layout = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(Payload.ToString());
+            string scannedItem = e.BarcodeResults.First().RawValue;
+            _ = HandleCreateResponseAsync(Layout, scannedItem);
+        }
+        else if (Status.StartsWith("MENU:"))
+        {
+            Dictionary<string, MenuOption> MenuCollection = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, MenuOption>>(Payload.ToString());
+        }
+        else
+        {
+            switch (PayloadType)
+            {
+                case "object":
+                    Payload = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(Payload.ToString());
+                    break;
+                default:
+                    Payload = Payload.ToString();
+                    break;
+            }
+            ProcessResult(Payload);
+        }
+    }
+
+
     private void ScannerEl_OnOnDetectionFinished(object? sender, OnDetectionFinishedEventArg e)
     {
         if (SOK.Connected)
@@ -172,149 +314,23 @@ public partial class Scanner : ContentPage
                 long unixTimeMillis = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 Payload.Add("timestamp", unixTimeMillis);
 
-                Dictionary<string, object> Barcode = new Dictionary<string, object>();
-                Barcode.Add("barcode", e.BarcodeResults.First().RawValue);
-                Barcode.Add("symbology", e.BarcodeResults.First().BarcodeFormat.ToString());
+                Dictionary<string, object> Barcode = new Dictionary<string, object>
+                {
+                    { "barcode", e.BarcodeResults.First().RawValue },
+                    { "symbology", e.BarcodeResults.First().BarcodeFormat.ToString() }
+                };
                 Payload.Add("barcode", Barcode);
 
-                Dictionary<string, object> Scanner = new Dictionary<string, object>();
-                Scanner.Add("id", MauiProgram._Enrollment.ClientID);
-                Scanner.Add("name", MauiProgram._Enrollment.ClientLabel);
-                Scanner.Add("appVersion", AppInfo.Current.Version.ToString());
-                Payload.Add("scanner", Scanner);
-
-                Action<SocketIOResponse> Callback = async (response) =>
+                Dictionary<string, object> Scanner = new Dictionary<string, object>
                 {
-                    BarcodeResponse Res = response.GetValue<BarcodeResponse>(0);
-                    string Status = Res.status;
-                    string PayloadType = Res.payloadType;
-                    object Payload = Res.payload;
-
-                    switch (PayloadType)
-                    {
-                        case "object":
-                            Payload =
-                                Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(
-                                    Payload.ToString());
-                            break;
-
-                        default:
-                            Payload = Payload.ToString();
-                            break;
-                    }
-
-                    if (Status == "ERROR") PlayAudio(AM_ERROR);
-                    else if (Status == "OK") PlayAudio(AM_OK);
-                    else if (Status == "CREATE") PlayAudio(AM_PROMPT);
-                    
-                    if (Status == "CREATE")
-                    {
-                        EnableCamera(false);
-                        MainThread.BeginInvokeOnMainThread(async () =>
-                        {
-                            Create C = new Create();
-                            Dictionary<string, object> Layout = (Dictionary<string, object>)Payload;
-                            foreach (string KEY in Layout.Keys)
-                            {
-                                if (Layout[KEY].Equals("string") || Layout[KEY].Equals("number"))
-                                {
-                                    C._ContentPH.Add(new VerticalStackLayout
-                                    {
-                                        Spacing = 8.0,
-                                        Children =
-                                        {
-                                            new Entry
-                                            {
-                                                IsReadOnly = KEY.StartsWith("_"),
-                                                ClassId = KEY.StartsWith("_") ? KEY.Substring(1) : KEY,
-                                                Text = KEY.StartsWith("_") ? e.BarcodeResults.First().RawValue : "",
-                                                BackgroundColor = Colors.LightGrey, PlaceholderColor = Colors.Gray,
-                                                Placeholder = KEY,
-                                                Keyboard = Layout[KEY].Equals("number")
-                                                    ? Keyboard.Numeric
-                                                    : Keyboard.Text
-                                            },
-                                        }
-                                    });
-                                }
-                                else if (Layout[KEY].Equals("ml_string"))
-                                {
-                                    C._ContentPH.Add(new VerticalStackLayout
-                                    {
-                                        Spacing = 8.0,
-                                        Children =
-                                        {
-                                            new Editor
-                                            {
-                                                IsReadOnly = KEY.StartsWith("_"),
-                                                ClassId = KEY.StartsWith("_") ? KEY.Substring(1) : KEY,
-                                                Text = KEY.StartsWith("_") ? e.BarcodeResults.First().RawValue : "",
-                                                BackgroundColor = Colors.LightGrey, PlaceholderColor = Colors.Gray,
-                                                Placeholder = KEY,
-                                                Keyboard = Keyboard.Text
-                                            },
-                                        }
-                                    });
-                                }
-
-                            }
-
-                            var R = await this.ShowPopupAsync(C);
-                            if (!((bool)R))
-                            {
-                                EnableCamera(true);
-                                return;
-                            }
-
-                            List<Entry> Entries = C._ContentPH.GetDescendantsOfType<Entry>().ToList();
-                            List<Editor> Editors = C._ContentPH.GetDescendantsOfType<Editor>().ToList();
-
-                            Dictionary<string, object> ItemPL = new Dictionary<string, object>();
-                            long unixTimeMillis = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                            ItemPL.Add("timestamp", unixTimeMillis);
-
-                            Dictionary<string, object> Scanner = new Dictionary<string, object>();
-                            Scanner.Add("id", MauiProgram._Enrollment.ClientID);
-                            Scanner.Add("name", MauiProgram._Enrollment.ClientLabel);
-                            Scanner.Add("appVersion", AppInfo.Current.Version.ToString());
-                            ItemPL.Add("scanner", Scanner);
-
-                            Dictionary<string, object> Item = new Dictionary<string, object>();
-                            foreach (Entry E in Entries)
-                            {
-                                if (E.ClassId != null && E.Text.Length > 0)
-                                {
-                                    Item.Add(E.ClassId, E.Keyboard == Keyboard.Numeric ? int.Parse(E.Text) : E.Text);
-                                }
-                            }
-
-                            foreach (Editor E in Editors)
-                            {
-                                if (E.ClassId != null && E.Text.Length > 0)
-                                {
-                                    Item.Add(E.ClassId, E.Text);
-                                }
-                            }
-
-                            ItemPL.Add("item", Item);
-
-                            SOK.EmitAsync("BARRED.Item", ItemPL).ContinueWith((t) =>
-                            {
-                                EnableCamera(true);
-                                ProcessResult($"Item Data Sent for Barcode, scan again to confirm if required.");
-                            });
-                        });
-                    }
-                    else
-                    {
-                        ProcessResult(Payload);
-                    }
+                    { "id", MauiProgram._Enrollment.ClientID },
+                    { "name", MauiProgram._Enrollment.ClientLabel },
+                    { "appVersion", AppInfo.Current.Version.ToString() }
                 };
-
-                SOK.EmitAsync("BARRED.Barcode", Callback, Payload).ContinueWith((t) =>
-                {
-                    ProcessResult($"Sent: {e.BarcodeResults.First().RawValue}");
-                });
+                Payload.Add("scanner", Scanner);
+                
+                Action<SocketIOResponse> Callback = (response) => HandleBarcodeResponse(response, e);
+                SOK.EmitAsync("BARRED.Barcode", Callback, Payload).ContinueWith((t) => { ProcessResult($"Sent: {e.BarcodeResults.First().RawValue}"); });
 
                 new Task(() =>
                 {
@@ -325,11 +341,32 @@ public partial class Scanner : ContentPage
         }
     }
     
-    private async void Button_OnClicked(object? sender, EventArgs e)
+    private async void Button_Menu(object? sender, EventArgs e)
     {
-        bool Yes = await DisplayAlert("Delete Registration?",
-            "Are you sure, you wish to delete the registration? Doing so will put the scanner in a state of 'Un-enrolled'",
-            "Yes", "No");
+        
+        Dictionary<string, object> Payload = new Dictionary<string, object>();
+        long unixTimeMillis = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        Payload.Add("timestamp", unixTimeMillis);
+
+        Dictionary<string, object> Action = new Dictionary<string, object>
+        {
+            { "action", "DEFAULT"},
+        };
+        Payload.Add("action", Action);
+        
+        Dictionary<string, object> scanner = new Dictionary<string, object>
+        {
+            { "id", MauiProgram._Enrollment.ClientID },
+            { "name", MauiProgram._Enrollment.ClientLabel },
+            { "appVersion", AppInfo.Current.Version.ToString() }
+        };
+        Payload.Add("scanner", scanner);
+        SOK.EmitAsync("BARRED.Action", Payload);
+    }
+
+    private async void Button_Delete(object? sender, EventArgs e)
+    {
+        bool Yes = await DisplayAlert("Delete Registration?", "Are you sure, you wish to delete the registration? Doing so will put the scanner in a state of 'Un-enrolled'", "Yes", "No");
         if (Yes)
         {
             Microsoft.Maui.Storage.Preferences.Remove("Enrollment");

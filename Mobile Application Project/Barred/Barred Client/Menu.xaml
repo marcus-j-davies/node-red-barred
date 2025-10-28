@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup
+    CanBeDismissedByTappingOutsideOfPopup="False"
+    Color="Transparent"
+    Size="350,600"
+    x:Class="Barred_Client.Menu"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:program="clr-namespace:Barred_Client"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+
+    <Border
+        BackgroundColor="LightGray"
+        Stroke="{x:Static program:MauiProgram.ThemeColor}"
+        StrokeThickness="2">
+
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="5" />
+        </Border.StrokeShape>
+
+        <Grid
+            BackgroundColor="LightGray"
+            Padding="5"
+            RowDefinitions="*, Auto"
+            RowSpacing="20">
+
+            <ScrollView Grid.Row="0">
+                <VerticalStackLayout Spacing="15" x:Name="ContentPH">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="20"
+                        HorizontalOptions="Center"
+                        Text="Menu"
+                        x:Name="Title" />
+                </VerticalStackLayout>
+            </ScrollView>
+
+
+            <HorizontalStackLayout
+                Grid.Row="1"
+                HorizontalOptions="Center"
+                Spacing="10"
+                VerticalOptions="End">
+                <Button
+                    BackgroundColor="#CCCCCC"
+                    Clicked="Button_Cancel"
+                    Text="Cancel"
+                    TextColor="Black" />
+            </HorizontalStackLayout>
+        </Grid>
+    </Border>
+</toolkit:Popup>

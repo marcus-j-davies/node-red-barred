@@ -6,6 +6,8 @@ using CommunityToolkit.Maui.Views;
 
 namespace Barred_Client;
 
+
+
 public partial class Scanner : ContentPage
 {
     private SocketIOClient.SocketIO SOK;
@@ -283,7 +285,28 @@ public partial class Scanner : ContentPage
         }
         else if (Status.StartsWith("MENU:"))
         {
+            string Title = Status.Substring("MENU:".Length);
             Dictionary<string, MenuOption> MenuCollection = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, MenuOption>>(Payload.ToString());
+
+            Menu M = new Menu(Title);
+            foreach (string key in MenuCollection.Keys)
+            {
+                Button BT = new Button();
+                BT.Text = key;
+                BT.ClassId = MenuCollection[key].action;
+                BT.StyleId = MenuCollection[key].scan.ToString();
+                BT.Clicked += Button_Menu;
+                BT.Text = key;
+                
+                M._ContentPH.Add(new VerticalStackLayout
+                {
+                    Spacing = 8.0,
+                    Children = {BT}
+                    
+                });
+            }
+
+            MainThread.InvokeOnMainThreadAsync(() => { this.ShowPopupAsync(M); });
         }
         else
         {

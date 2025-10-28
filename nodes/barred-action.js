@@ -6,12 +6,12 @@ module.exports = function (RED) {
 		self.config = config;
 		self.stack = RED.nodes.getNode(self.config.stack);
 
-		self.stack.registerBarcodeEmitter(self.id, (msg) => {
+		self.stack.registerActionEmitter(self.id, (msg) => {
 			self.send(msg);
 		});
 
 		self.on('close', (_, done) => {
-			self.stack.unregisterBarcodeEmitter(self.id);
+			self.stack.unregisterActionEmitter(self.id);
 			done();
 		});
 	}

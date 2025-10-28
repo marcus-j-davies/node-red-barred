@@ -126,6 +126,7 @@
                     Text="D" />
                 <Button
                     BackgroundColor="{x:Static program:MauiProgram.ThemeColor}"
+                    ClassId="DEFAULT"
                     Clicked="Button_Menu"
                     FontSize="20"
                     Text="M" />

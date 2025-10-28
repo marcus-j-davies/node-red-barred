@@ -8,11 +8,12 @@ namespace Barred_Client;
 
 public partial class Scanner : ContentPage
 {
-    private static SocketIOClient.SocketIO SOK;
-    private static IAudioManager AM;
-    private static IAudioPlayer AM_OK;
-    private static IAudioPlayer AM_ERROR;
-    private static IAudioPlayer AM_PROMPT;
+    private SocketIOClient.SocketIO SOK;
+    private IAudioManager AM;
+    private IAudioPlayer AM_OK;
+    private IAudioPlayer AM_ERROR;
+    private IAudioPlayer AM_PROMPT;
+    private TaskCompletionSource<OnDetectionFinishedEventArg>? _scanWaiter;
 
     public Scanner(IAudioManager AudioManager)
     {
@@ -52,7 +53,7 @@ public partial class Scanner : ContentPage
         MainThread.BeginInvokeOnMainThread(() => { ScannerEl.CameraEnabled = enable; });
     }
 
-    private void ProcessResult(object Obj)
+    private void RenderPayload(object Obj)
     {
         MainThread.BeginInvokeOnMainThread(() =>
         {
@@ -102,7 +103,7 @@ public partial class Scanner : ContentPage
 
     private async void SetupConnection()
     {
-        ProcessResult("Connecting to Stack...");
+        RenderPayload("Connecting to Stack...");
         SocketIOOptions Ops = new SocketIOOptions();
         Ops.Path = MauiProgram._Enrollment.Namespace;
         Ops.Reconnection = true;
@@ -118,17 +119,17 @@ public partial class Scanner : ContentPage
         SOK.OnError += (sender, s) =>
         {
             PlayAudio(AM_ERROR);
-            ProcessResult($"ERROR: {s}");
+            RenderPayload($"ERROR: {s}");
         };
         SOK.OnDisconnected += (sender, s) =>
         {
             PlayAudio(AM_ERROR);
-            ProcessResult("Lost connection to the Stack");
+            RenderPayload("Lost connection to the Stack");
         };
         SOK.OnConnected += (sender, args) =>
         {
             PlayAudio(AM_OK);
-            ProcessResult("Scanner Ready!");
+            RenderPayload("Scanner Ready!");
 
             MainThread.BeginInvokeOnMainThread(() =>
             {
@@ -157,7 +158,7 @@ public partial class Scanner : ContentPage
                     break;
             }
 
-            ProcessResult(IN.payload);
+            RenderPayload(IN.payload);
         });
 
         await SOK.ConnectAsync(CancellationToken.None);
@@ -259,11 +260,11 @@ public partial class Scanner : ContentPage
 
             await SOK.EmitAsync("BARRED.Item", itemPayload);
             EnableCamera(true);
-            ProcessResult($"Item Data Sent for Barcode: {scannedItem}, scan again to confirm if required.");
+            RenderPayload($"Item Data Sent for Barcode: {scannedItem}, scan again to confirm if required.");
         });
     }
 
-    private void HandleBarcodeResponse(SocketIOResponse response, OnDetectionFinishedEventArg e)
+    private void HandleRootStackResponse(SocketIOResponse response, OnDetectionFinishedEventArg e)
     {
         BarcodeResponse Res = response.GetValue<BarcodeResponse>(0);
         string Status = Res.status;
@@ -274,7 +275,7 @@ public partial class Scanner : ContentPage
         else if (Status == "OK") PlayAudio(AM_OK);
         else if (Status == "CREATE") PlayAudio(AM_PROMPT);
 
-        if (Status == "CREATE")
+        if (Status == "CREATE" && e != null)
         {
             Dictionary<string, object> Layout = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(Payload.ToString());
             string scannedItem = e.BarcodeResults.First().RawValue;
@@ -295,7 +296,8 @@ public partial class Scanner : ContentPage
                     Payload = Payload.ToString();
                     break;
             }
-            ProcessResult(Payload);
+
+            RenderPayload(Payload);
         }
     }
 
@@ -308,7 +310,19 @@ public partial class Scanner : ContentPage
             {
                 ScannerEl.PauseScanning = true;
 
-                ProcessResult("Sending...");
+                if (_scanWaiter != null)
+                {
+                    _scanWaiter.TrySetResult(e);
+                    _scanWaiter = null;
+                    new Task(() =>
+                    {
+                        Thread.Sleep(MauiProgram._Enrollment.ScanRate);
+                        ScannerEl.PauseScanning = false;
+                    }).Start();
+                    return;
+                }
+
+                RenderPayload("Sending...");
 
                 Dictionary<string, object> Payload = new Dictionary<string, object>();
                 long unixTimeMillis = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -328,9 +342,9 @@ public partial class Scanner : ContentPage
                     { "appVersion", AppInfo.Current.Version.ToString() }
                 };
                 Payload.Add("scanner", Scanner);
-                
-                Action<SocketIOResponse> Callback = (response) => HandleBarcodeResponse(response, e);
-                SOK.EmitAsync("BARRED.Barcode", Callback, Payload).ContinueWith((t) => { ProcessResult($"Sent: {e.BarcodeResults.First().RawValue}"); });
+
+                Action<SocketIOResponse> Callback = (response) => HandleRootStackResponse(response, e);
+                SOK.EmitAsync("BARRED.Barcode", Callback, Payload).ContinueWith((t) => { RenderPayload($"Sent: {e.BarcodeResults.First().RawValue}"); });
 
                 new Task(() =>
                 {
@@ -340,20 +354,37 @@ public partial class Scanner : ContentPage
             }
         }
     }
-    
+
     private async void Button_Menu(object? sender, EventArgs e)
     {
-        
+        OnDetectionFinishedEventArg? scanResult = null;
+        string _Action = ((Button)sender).ClassId;
+        bool Scan = Convert.ToBoolean(((Button)sender).StyleId);
+
+        if (Scan)
+        {
+            PlayAudio(AM_PROMPT);
+            RenderPayload($"Please perform item scan...");
+            _scanWaiter = new TaskCompletionSource<OnDetectionFinishedEventArg>();
+            scanResult = await _scanWaiter.Task;
+            _scanWaiter = null;
+        }
+
         Dictionary<string, object> Payload = new Dictionary<string, object>();
         long unixTimeMillis = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         Payload.Add("timestamp", unixTimeMillis);
 
         Dictionary<string, object> Action = new Dictionary<string, object>
         {
-            { "action", "DEFAULT"},
+            { "name", _Action },
         };
+        if (scanResult != null)
+        {
+            Action.Add("barcode", scanResult.BarcodeResults.First().RawValue);
+        }
+
         Payload.Add("action", Action);
-        
+
         Dictionary<string, object> scanner = new Dictionary<string, object>
         {
             { "id", MauiProgram._Enrollment.ClientID },
@@ -361,7 +392,9 @@ public partial class Scanner : ContentPage
             { "appVersion", AppInfo.Current.Version.ToString() }
         };
         Payload.Add("scanner", scanner);
-        SOK.EmitAsync("BARRED.Action", Payload);
+
+        Action<SocketIOResponse> Callback = (response) => HandleRootStackResponse(response, scanResult);
+        SOK.EmitAsync("BARRED.Action", Callback, Payload).ContinueWith((t) => { RenderPayload($"Action Sent"); });
     }
 
     private async void Button_Delete(object? sender, EventArgs e)

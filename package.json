@@ -1,6 +1,6 @@
 {
 	"name": "@marcus-j-davies/node-red-barred",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"license": "MIT",
 	"description": "The Node RED Barcode Processing Platform",
 	"keywords": [
@@ -10,13 +10,14 @@
 		"code",
 		"scanner",
 		"maui",
-		"native"
+		"native",
+		"terminal"
 	],
 	"dependencies": {
 		"socket.io": "^4.8.1"
 	},
 	"devDependencies": {
-		"eslint": "^9.35.0",
+		"eslint": "^9.38.0",
 		"prettier": "^3.6.2"
 	},
 	"engines": {
@@ -29,7 +30,8 @@
 			"barred-barcode": "nodes/barred-barcode.js",
 			"barred-item": "nodes/barred-item.js",
 			"barred-result": "nodes/barred-result.js",
-			"barred-send-item": "nodes/barred-send-item.js"
+			"barred-send-item": "nodes/barred-send-item.js",
+			"barred-action": "nodes/barred-action.js"
 		}
 	},
 	"bugs": {

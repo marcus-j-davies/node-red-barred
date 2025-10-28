@@ -24,6 +24,8 @@ public partial class Scanner : ContentPage
         SetupAudio();
         SetupConnection();
     }
+    
+   
 
     protected override void OnDisappearing()
     {
@@ -295,14 +297,18 @@ public partial class Scanner : ContentPage
                 BT.Text = key;
                 BT.ClassId = MenuCollection[key].action;
                 BT.StyleId = MenuCollection[key].scan.ToString();
-                BT.Clicked += Button_Menu;
+                BT.Clicked += (sender, e) =>
+                {
+                    Button_Menu(sender, e);
+                    M.Close();
+                };
+                BT.BackgroundColor = MenuCollection[key].destructive ? Colors.Red : MauiProgram.ThemeColor;
                 BT.Text = key;
                 
                 M._ContentPH.Add(new VerticalStackLayout
                 {
                     Spacing = 8.0,
                     Children = {BT}
-                    
                 });
             }
 
@@ -323,8 +329,7 @@ public partial class Scanner : ContentPage
             RenderPayload(Payload);
         }
     }
-
-
+    
     private void ScannerEl_OnOnDetectionFinished(object? sender, OnDetectionFinishedEventArg e)
     {
         if (SOK.Connected)

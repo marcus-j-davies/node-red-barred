@@ -72,15 +72,24 @@
                     Offset="5,5"
                     Opacity="0.8" />
             </Border.Shadow>
-            <scanner:CameraView
-                BarcodeSymbologies="All"
-                CameraEnabled="True"
-                HeightRequest="150"
-                OnDetectionFinished="ScannerEl_OnOnDetectionFinished"
-                TapToFocusEnabled="True"
-                ViewfinderMode="True"
-                WidthRequest="350"
-                x:Name="ScannerEl" />
+            <Grid HeightRequest="150" WidthRequest="350">
+                <scanner:CameraView
+                    BarcodeSymbologies="All"
+                    CameraEnabled="True"
+                    HeightRequest="150"
+                    OnDetectionFinished="ScannerEl_OnOnDetectionFinished"
+                    TapToFocusEnabled="True"
+                    ViewfinderMode="True"
+                    WidthRequest="350"
+                    x:Name="ScannerEl" />
+                <BoxView
+                    BackgroundColor="Red"
+                    HeightRequest="5"
+                    HorizontalOptions="Fill"
+                    Opacity="0.3"
+                    VerticalOptions="Center" />
+            </Grid>
+
         </Border>
 
         <Border

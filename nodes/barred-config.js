@@ -76,6 +76,10 @@ module.exports = function (RED) {
 
 			scanner.on('BARRED.Item', (args) => {
 				const msg = {
+					_barredCB: {
+						expires: new Date().getTime() + parseInt(config.rtimeout),
+						callback: callback
+					},
 					payload: {
 						timestamp: args.timestamp,
 						item: { ...args.item },
@@ -89,7 +93,6 @@ module.exports = function (RED) {
 			scanner.on('BARRED.Barcode', (args, callback) => {
 				const msg = {
 					_barredCB: {
-						barcode: args.barcode.barcode,
 						expires: new Date().getTime() + parseInt(config.rtimeout),
 						callback: callback
 					},

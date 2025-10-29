@@ -1,3 +1,4 @@
+using System.Globalization;
 using BarcodeScanning;
 using Plugin.Maui.Audio;
 using SocketIOClient;
@@ -164,7 +165,53 @@ public partial class Scanner : ContentPage
         await SOK.ConnectAsync(CancellationToken.None);
     }
 
-    private async Task HandleCreateResponseAsync(Dictionary<string, object> layout, string scannedItem)
+    private IView GetControl(object value, string key)
+    {
+        
+        switch (value)
+        {
+            case "string":
+            case "number":
+                Entry En = new Entry();
+                En.BindingContext = key;
+                En.BackgroundColor = Colors.LightGrey;
+                En.PlaceholderColor = Colors.Gray;
+                En.Keyboard = value.Equals("number") ? Keyboard.Numeric : Keyboard.Text;
+                return En;
+            
+            case "ml_string":
+                Editor Ed = new Editor();
+                Ed.BindingContext = key;
+                Ed.BackgroundColor = Colors.LightGrey;
+                Ed.PlaceholderColor = Colors.Gray;
+                Ed.Keyboard = Keyboard.Text;
+                return Ed;
+            
+            case "date":
+                DatePicker Dp = new DatePicker();
+                Dp.BindingContext = key;
+                Dp.BackgroundColor = Colors.LightGrey;
+                return Dp;
+            
+            case "time":
+                TimePicker Tm = new TimePicker();
+                Tm.BindingContext = key;
+                Tm.BackgroundColor = Colors.LightGrey;
+                return Tm;
+            
+            default:
+                Entry De = new Entry();
+                De.IsReadOnly = true;
+                De.Text = value.ToString();
+                De.BindingContext = key;
+                De.BackgroundColor = Colors.LightGrey;
+                De.PlaceholderColor = Colors.Gray;
+                De.Keyboard = Int64.TryParse(value.ToString(), out _) ? Keyboard.Numeric : Keyboard.Text;
+                return De;
+        }
+    }
+
+    private async Task HandleInfoResponseAsync(Dictionary<string, object> layout)
     {
         EnableCamera(false);
         await MainThread.InvokeOnMainThreadAsync(async () =>
@@ -174,47 +221,15 @@ public partial class Scanner : ContentPage
             foreach (string key in layout.Keys)
             {
                 object value = layout[key];
+                
+                Label L = new Label();
+                L.Text = key;
 
-                if (value.Equals("string") || value.Equals("number"))
+                I._ContentPH.Add(new VerticalStackLayout
                 {
-                    I._ContentPH.Add(new VerticalStackLayout
-                    {
-                        Spacing = 8.0,
-                        Children =
-                        {
-                            new Entry
-                            {
-                                BindingContext = key.StartsWith("_") ? key.Substring(1) : key,
-                                IsReadOnly = key.StartsWith("_"),
-                                Text = key.StartsWith("_") ? scannedItem : "",
-                                BackgroundColor = Colors.LightGrey,
-                                PlaceholderColor = Colors.Gray,
-                                Placeholder = key,
-                                Keyboard = value.Equals("number") ? Keyboard.Numeric : Keyboard.Text
-                            },
-                        }
-                    });
-                }
-                else if (value.Equals("ml_string"))
-                {
-                    I._ContentPH.Add(new VerticalStackLayout
-                    {
-                        Spacing = 8.0,
-                        Children =
-                        {
-                            new Editor
-                            {
-                                BindingContext = key.StartsWith("_") ? key.Substring(1) : key,
-                                IsReadOnly = key.StartsWith("_"),
-                                Text = key.StartsWith("_") ? scannedItem : "",
-                                BackgroundColor = Colors.LightGrey,
-                                PlaceholderColor = Colors.Gray,
-                                Placeholder = key,
-                                Keyboard = Keyboard.Text
-                            },
-                        }
-                    });
-                }
+                    Spacing = 8.0,
+                    Children = {L, GetControl(value, key) }
+                });
             }
 
             var popupResult = await this.ShowPopupAsync(I);
@@ -226,6 +241,8 @@ public partial class Scanner : ContentPage
 
             List<Entry> entries = I._ContentPH.GetDescendantsOfType<Entry>().ToList();
             List<Editor> editors = I._ContentPH.GetDescendantsOfType<Editor>().ToList();
+            List<DatePicker> datePickers = I._ContentPH.GetDescendantsOfType<DatePicker>().ToList();
+            List<TimePicker> timePickers = I._ContentPH.GetDescendantsOfType<TimePicker>().ToList();
 
             Dictionary<string, object> itemPayload = new Dictionary<string, object>();
             long unixTimeMillis = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -242,25 +259,33 @@ public partial class Scanner : ContentPage
             Dictionary<string, object> item = new Dictionary<string, object>();
             foreach (Entry e in entries)
             {
-                if (e.BindingContext != null && e.Text.Length > 0)
+                if (e.BindingContext != null && !string.IsNullOrEmpty(e.Text))
                 {
-                    item.Add(e.BindingContext.ToString(), e.Keyboard == Keyboard.Numeric ? int.Parse(e.Text) : e.Text);
+                    if(e.Keyboard == Keyboard.Numeric) item.Add(e.BindingContext.ToString(), Int64.Parse(e.Text));
+                    if(e.Keyboard == Keyboard.Text) item.Add(e.BindingContext.ToString(), e.Text);
                 }
             }
 
             foreach (Editor ed in editors)
             {
-                if (ed.BindingContext != null && ed.Text.Length > 0)
-                {
-                    item.Add(ed.BindingContext.ToString(), ed.Text);
-                }
+                if (ed.BindingContext != null && !string.IsNullOrEmpty(ed.Text)) item.Add(ed.BindingContext.ToString(), ed.Text);
+            }
+            
+            foreach (DatePicker dp in datePickers)
+            {
+                if (dp.BindingContext != null) item.Add(dp.BindingContext.ToString(),new DateTimeOffset(dp.Date.ToUniversalTime()).ToUnixTimeMilliseconds());
+            }
+            
+            foreach (TimePicker tm in timePickers)
+            {
+                if (tm.BindingContext != null) item.Add(tm.BindingContext.ToString(),tm.Time.ToString());
             }
 
             itemPayload.Add("item", item);
 
             await SOK.EmitAsync("BARRED.Item", itemPayload);
             EnableCamera(true);
-            RenderPayload($"Item Data Sent for Barcode: {scannedItem}, scan again to confirm if required.");
+            RenderPayload($"Item Data Sent submitted.");
         });
     }
 
@@ -269,7 +294,7 @@ public partial class Scanner : ContentPage
         BarcodeResponse Res = response.GetValue<BarcodeResponse>(0);
         string Status = Res.status;
         string PayloadType = Res.payloadType;
-        string OriginalBarcode = Res.barcode;
+        //string OriginalBarcode = Res.barcode;
         string Title = Res.title;
         object Payload = Res.payload;
 
@@ -278,10 +303,10 @@ public partial class Scanner : ContentPage
         else if (Status == "INFO") PlayAudio(AM_PROMPT);
         else if (Status == "MENU") PlayAudio(AM_PROMPT);
 
-        if (Status == "INFO" && !string.IsNullOrEmpty(OriginalBarcode))
+        if (Status == "INFO")
         {
             Dictionary<string, object> Layout = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(Payload.ToString());
-            _ = HandleCreateResponseAsync(Layout, OriginalBarcode);
+            _ = HandleInfoResponseAsync(Layout);
         }
         else if (Status == "MENU")
         {
@@ -390,7 +415,7 @@ public partial class Scanner : ContentPage
             if (MO.scan)
             {
                 PlayAudio(AM_PROMPT);
-                RenderPayload($"Please perform item scan...");
+                RenderPayload($"Action requires a scan: please perform item scan...");
                 _scanWaiter = new TaskCompletionSource<OnDetectionFinishedEventArg>();
                 scanResult = await _scanWaiter.Task;
                 _scanWaiter = null;
@@ -402,7 +427,8 @@ public partial class Scanner : ContentPage
 
             Dictionary<string, object> Action = new Dictionary<string, object>
             {
-                { "name", MO.action },
+                { "name", MO.action},
+                { "context", MO.context ?? null},
             };
             if (scanResult != null)
             {

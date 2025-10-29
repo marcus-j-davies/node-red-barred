@@ -11,6 +11,13 @@
         <toolkit:StatusBarBehavior StatusBarColor="{x:Static program:MauiProgram.ThemeColor}" StatusBarStyle="LightContent" />
     </ContentPage.Behaviors>
 
+    <ContentPage.Resources>
+        <program:MenuOption
+            action="DEFAULT"
+            scan="False"
+            x:Key="MenuCtx" />
+    </ContentPage.Resources>
+
     <Grid
         Margin="0,5,0,0"
         Padding="30"
@@ -126,20 +133,15 @@
                     Text="D" />
                 <Button
                     BackgroundColor="{x:Static program:MauiProgram.ThemeColor}"
-                    ClassId="DEFAULT"
+                    BindingContext="{StaticResource MenuCtx}"
                     Clicked="Button_Menu"
                     FontSize="20"
                     Text="M" />
+
+
             </StackLayout>
 
-            <!--
-            <Button
-                BackgroundColor="{x:Static program:MauiProgram.ThemeColor}"
-                Clicked="Button_OnClicked"
-                FontSize="20"
-                Grid.Column="0"
-                HorizontalOptions="Center"
-                Text="Delete En" />-->
+
             <Label
                 Grid.Column="1"
                 HorizontalOptions="Center"

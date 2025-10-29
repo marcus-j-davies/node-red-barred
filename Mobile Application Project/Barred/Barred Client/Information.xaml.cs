@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Barred_Client;
 
-public partial class Create : CommunityToolkit.Maui.Views.Popup
+public partial class Information : CommunityToolkit.Maui.Views.Popup
 {
     public VerticalStackLayout _ContentPH;
-    public Create()
+    public Information()
     {
         InitializeComponent();
         _ContentPH = ContentPH;

@@ -3,7 +3,7 @@
     CanBeDismissedByTappingOutsideOfPopup="False"
     Color="Transparent"
     Size="350,600"
-    x:Class="Barred_Client.Create"
+    x:Class="Barred_Client.Information"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:program="clr-namespace:Barred_Client"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -31,7 +31,7 @@
                         FontAttributes="Bold"
                         FontSize="20"
                         HorizontalOptions="Center"
-                        Text="Add Item" />
+                        Text="Provide Information" />
 
 
                 </VerticalStackLayout>
@@ -47,13 +47,15 @@
                     BackgroundColor="#CCCCCC"
                     Clicked="Button_Cancel"
                     Text="Cancel"
-                    TextColor="Black" />
+                    TextColor="Black"
+                    WidthRequest="100" />
 
                 <Button
                     BackgroundColor="{x:Static program:MauiProgram.ThemeColor}"
                     Clicked="Button_Submit"
                     Text="Submit"
-                    TextColor="White" />
+                    TextColor="White"
+                    WidthRequest="100" />
             </HorizontalStackLayout>
         </Grid>
     </Border>

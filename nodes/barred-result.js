@@ -9,6 +9,8 @@ module.exports = function (RED) {
 			if (msg._barredCB) {
 				if (msg._barredCB.expires > new Date().getTime()) {
 					msg._barredCB.callback({
+						title: msg.topic,
+						barcode: msg._barredCB.barcode,
 						status: msg.status || config.defaultStatus,
 						payload: msg.payload,
 						payloadType: typeof msg.payload

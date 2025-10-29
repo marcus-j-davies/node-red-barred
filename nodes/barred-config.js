@@ -46,11 +46,11 @@ module.exports = function (RED) {
 
 			if (id) {
 				if (connectedScanners[id]) {
-					connectedScanners[id].emit('BARRED.Prompt', PL);
+					connectedScanners[id].emit('BARRED.Item', PL);
 				}
 			} else {
 				Object.values(connectedScanners).forEach((S) => {
-					S.emit('BARRED.Prompt', PL);
+					S.emit('BARRED.Item', PL);
 				});
 			}
 		};
@@ -89,6 +89,7 @@ module.exports = function (RED) {
 			scanner.on('BARRED.Barcode', (args, callback) => {
 				const msg = {
 					_barredCB: {
+						barcode: args.barcode.barcode,
 						expires: new Date().getTime() + parseInt(config.rtimeout),
 						callback: callback
 					},
@@ -105,6 +106,7 @@ module.exports = function (RED) {
 			scanner.on('BARRED.Action', (args, callback) => {
 				const msg = {
 					_barredCB: {
+						barcode: args.action.barcode,
 						expires: new Date().getTime() + parseInt(config.rtimeout),
 						callback: callback
 					},

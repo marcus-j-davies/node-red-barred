@@ -2,7 +2,7 @@
 <toolkit:Popup
     CanBeDismissedByTappingOutsideOfPopup="False"
     Color="Transparent"
-    Size="350,600"
+    Size="300,400"
     x:Class="Barred_Client.Menu"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:program="clr-namespace:Barred_Client"
@@ -46,7 +46,8 @@
                     BackgroundColor="#CCCCCC"
                     Clicked="Button_Cancel"
                     Text="Cancel"
-                    TextColor="Black" />
+                    TextColor="Black"
+                    WidthRequest="100" />
             </HorizontalStackLayout>
         </Grid>
     </Border>

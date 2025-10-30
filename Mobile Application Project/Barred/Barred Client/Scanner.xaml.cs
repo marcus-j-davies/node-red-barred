@@ -285,7 +285,7 @@ public partial class Scanner : ContentPage
             Action<SocketIOResponse> Callback = (response) => HandleRootStackResponse(response);
             SOK.EmitAsync("BARRED.Item", Callback, itemPayload).ContinueWith((t) =>
             {
-                RenderPayload($"Item Data Sent submitted.");
+                RenderPayload($"Item Data submitted.");
                 EnableCamera(true);
                 
             });

@@ -74,7 +74,7 @@ module.exports = function (RED) {
 		self.io.on('connection', (scanner) => {
 			connectedScanners[scanner.handshake.auth.id] = scanner;
 
-			scanner.on('BARRED.Item', (args) => {
+			scanner.on('BARRED.Item', (args, callback) => {
 				const msg = {
 					_barredCB: {
 						expires: new Date().getTime() + parseInt(config.rtimeout),

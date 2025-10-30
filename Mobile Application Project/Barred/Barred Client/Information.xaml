@@ -13,35 +13,38 @@
     <Border
         BackgroundColor="LightGray"
         Stroke="{x:Static program:MauiProgram.ThemeColor}"
-        StrokeThickness="2">
+        StrokeThickness="5">
 
         <Border.StrokeShape>
-            <RoundRectangle CornerRadius="5" />
+            <RoundRectangle CornerRadius="10" />
         </Border.StrokeShape>
 
         <Grid
             BackgroundColor="LightGray"
-            Padding="5"
-            RowDefinitions="*, Auto"
-            RowSpacing="20">
+            Padding="0"
+            RowDefinitions="Auto,*,Auto"
+            RowSpacing="0">
 
-            <ScrollView Grid.Row="0">
-                <VerticalStackLayout Spacing="15" x:Name="ContentPH">
-                    <Label
-                        FontAttributes="Bold"
-                        FontSize="20"
-                        HorizontalOptions="Center"
-                        Text="Provide Information" />
+            <Label
+                BackgroundColor="{x:Static program:MauiProgram.ThemeColor}"
+                FontAttributes="Bold"
+                FontSize="20"
+                Grid.Row="0"
+                HorizontalOptions="Fill"
+                HorizontalTextAlignment="Center"
+                Padding="0,5"
+                Text="Provide Information"
+                TextColor="White" />
 
-
-                </VerticalStackLayout>
+            <ScrollView Grid.Row="1" Padding="10">
+                <VerticalStackLayout Spacing="15" x:Name="ContentPH" />
             </ScrollView>
 
 
             <HorizontalStackLayout
-                Grid.Row="1"
+                Grid.Row="2"
                 HorizontalOptions="Center"
-                Spacing="10"
+                Padding="10"
                 VerticalOptions="End">
                 <Button
                     BackgroundColor="#CCCCCC"

@@ -294,7 +294,6 @@ public partial class Scanner : ContentPage
         BarcodeResponse Res = response.GetValue<BarcodeResponse>(0);
         string Status = Res.status;
         string PayloadType = Res.payloadType;
-        //string OriginalBarcode = Res.barcode;
         string Title = Res.title;
         object Payload = Res.payload;
 
@@ -321,8 +320,12 @@ public partial class Scanner : ContentPage
                 BT.BindingContext = MenuCollection[key];
                 BT.Clicked += (sender, e) =>
                 {
-                    Button_Menu(sender, e);
-                    M.Close();
+                    M.CloseAsync().ContinueWith((t) =>
+                    {
+                        Button_Menu(sender, e);
+                    });
+                    
+                    
                 };
                 BT.BackgroundColor = MenuCollection[key].destructive ? Colors.Red : MauiProgram.ThemeColor;
                 BT.Text = key;

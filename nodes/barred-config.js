@@ -109,13 +109,13 @@ module.exports = function (RED) {
 			scanner.on('BARRED.Action', (args, callback) => {
 				const msg = {
 					_barredCB: {
-						barcode: args.action.barcode,
 						expires: new Date().getTime() + parseInt(config.rtimeout),
 						callback: callback
 					},
 					payload: {
 						timestamp: args.timestamp,
 						action: { ...args.action },
+						barcode: args.barcode ? { ...args.barcode } : undefined,
 						scanner: { ...args.scanner }
 					}
 				};

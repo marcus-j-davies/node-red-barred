@@ -444,7 +444,7 @@ public partial class Scanner : ContentPage
             if (scanResult != null)
             {
                 Dictionary<string, object> Barcode = new Dictionary<string, object>();
-                Barcode.Add("symbology", scanResult.BarcodeResults.First().BarcodeFormat);
+                Barcode.Add("symbology", scanResult.BarcodeResults.First().BarcodeFormat.ToString());
                 Barcode["barcode"] = long.TryParse(scanResult.BarcodeResults.First().RawValue, out var parsed)
                     ? parsed
                     : scanResult.BarcodeResults.First().RawValue;

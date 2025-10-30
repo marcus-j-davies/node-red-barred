@@ -167,7 +167,6 @@ public partial class Scanner : ContentPage
 
     private IView GetControl(object value, string key)
     {
-        
         switch (value)
         {
             case "string":
@@ -287,7 +286,6 @@ public partial class Scanner : ContentPage
             {
                 RenderPayload($"Item Data submitted.");
                 EnableCamera(true);
-                
             });
             
         });
@@ -328,8 +326,6 @@ public partial class Scanner : ContentPage
                     {
                         Button_Menu(sender, e);
                     });
-                    
-                    
                 };
                 BT.BackgroundColor = MenuCollection[key].destructive ? Colors.Red : MauiProgram.ThemeColor;
                 BT.Text = key;
@@ -358,7 +354,7 @@ public partial class Scanner : ContentPage
             RenderPayload(Payload);
         }
     }
-    
+
     private void ScannerEl_OnOnDetectionFinished(object? sender, OnDetectionFinishedEventArg e)
     {
         if (SOK.Connected)
@@ -387,9 +383,12 @@ public partial class Scanner : ContentPage
 
                 Dictionary<string, object> Barcode = new Dictionary<string, object>
                 {
-                    { "barcode", e.BarcodeResults.First().RawValue },
                     { "symbology", e.BarcodeResults.First().BarcodeFormat.ToString() }
                 };
+                Barcode["barcode"] = long.TryParse(e.BarcodeResults.First().RawValue, out var parsed)
+                    ? parsed
+                    : e.BarcodeResults.First().RawValue;
+
                 Payload.Add("barcode", Barcode);
 
                 Dictionary<string, object> Scanner = new Dictionary<string, object>
@@ -435,15 +434,24 @@ public partial class Scanner : ContentPage
             Dictionary<string, object> Action = new Dictionary<string, object>
             {
                 { "name", MO.action},
-                { "context", MO.context ?? null},
             };
+            if(MO.context != null)
+            {
+                Action.Add("context", MO.context);
+            }
+            Payload.Add("action", Action);
+            
             if (scanResult != null)
             {
-                Action.Add("barcode", scanResult.BarcodeResults.First().RawValue);
+                Dictionary<string, object> Barcode = new Dictionary<string, object>();
+                Barcode.Add("symbology", scanResult.BarcodeResults.First().BarcodeFormat);
+                Barcode["barcode"] = long.TryParse(scanResult.BarcodeResults.First().RawValue, out var parsed)
+                    ? parsed
+                    : scanResult.BarcodeResults.First().RawValue;
+
+                Payload.Add("barcode",Barcode);
             }
-
-            Payload.Add("action", Action);
-
+            
             Dictionary<string, object> scanner = new Dictionary<string, object>
             {
                 { "id", MauiProgram._Enrollment.ClientID },

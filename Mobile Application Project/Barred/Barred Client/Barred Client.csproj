@@ -41,6 +41,7 @@
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <AndroidSupportedAbis>armeabi-v7a;arm64-v8a</AndroidSupportedAbis>
       <AndroidPackageFormat>apk</AndroidPackageFormat>
+      <MtouchLink>None</MtouchLink>
     </PropertyGroup>
     
     <ItemGroup>

@@ -43,6 +43,12 @@ There is a complete flow example included with this Node RED module, but detalin
  - Rider 2025.2.3
  - MacOS 26
 
+ The complete set of elements to get up and running  are [here](./Complete%20Dist/)
+
+  - Android APK
+  - iOS IPA (Unsigned)
+  - Node RED Module (but this can also be installed via the standard methods) 
+
 ## To do
 
  - Allow rich content in responses / items.

@@ -437,6 +437,10 @@ public partial class Scanner : ContentPage
             };
             if(MO.context != null)
             {
+                if (MO.contextType == "object")
+                {
+                    MO.context = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(MO.context.ToString());
+                }
                 Action.Add("context", MO.context);
             }
             Payload.Add("action", Action);

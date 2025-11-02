@@ -6,4 +6,6 @@ public class MenuOption
     public bool scan { get; set; }
     public bool destructive { get; set; }
     public object context { get; set; }
+    public string contextType { get; set; }
+    
 }

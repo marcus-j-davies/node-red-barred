@@ -23,7 +23,7 @@
         <ApplicationTitle>Barred</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.please-dont-use-my-name.barred</ApplicationId>
+        <ApplicationId>com.noname.barred</ApplicationId>
 
         <!-- Versions -->
         <ApplicationDisplayVersion>1.1.0</ApplicationDisplayVersion>

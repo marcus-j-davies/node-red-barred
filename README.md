@@ -34,8 +34,9 @@ In affect - this Module (along with the Native Mobile applcation - Which is Free
 
 There is a complete flow example included with this Node RED module, but detaling how it all fits toiegther in text, is difficult, so I provide a video walk through of this platform below.
 
+[![Watch the video](./Help/Snap.png)](https://github.com/marcus-j-davies/node-red-barred/raw/refs/heads/v1.1.0/Help/Walkthrough.mov?download)
 
-<video controls src="https://github.com/marcus-j-davies/node-red-barred/raw/refs/heads/v1.1.0/Help/Walkthrough.mov?download=" title="./Help/Walkthrough.mp4"></video>
+
 
 # Native App Build Environment
 

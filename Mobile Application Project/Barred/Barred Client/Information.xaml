@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup
+    CanBeDismissedByTappingOutsideOfPopup="False"
+    Color="Transparent"
+    Size="350,600"
+    x:Class="Barred_Client.Information"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:program="clr-namespace:Barred_Client"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+
+    <Border
+        BackgroundColor="LightGray"
+        Stroke="{x:Static program:MauiProgram.ThemeColor}"
+        StrokeThickness="5">
+
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="10" />
+        </Border.StrokeShape>
+
+        <Grid
+            BackgroundColor="LightGray"
+            Padding="0"
+            RowDefinitions="Auto,*,Auto"
+            RowSpacing="0">
+
+            <Label
+                BackgroundColor="{x:Static program:MauiProgram.ThemeColor}"
+                FontAttributes="Bold"
+                FontSize="20"
+                Grid.Row="0"
+                HorizontalOptions="Fill"
+                HorizontalTextAlignment="Center"
+                Padding="0,5"
+                Text="Provide Information"
+                TextColor="White" />
+
+            <ScrollView Grid.Row="1" Padding="10">
+                <VerticalStackLayout Spacing="15" x:Name="ContentPH" />
+            </ScrollView>
+
+
+            <HorizontalStackLayout
+                Grid.Row="2"
+                HorizontalOptions="Center"
+                Padding="10"
+                VerticalOptions="End">
+                <Button
+                    BackgroundColor="#CCCCCC"
+                    Clicked="Button_Cancel"
+                    Text="Cancel"
+                    TextColor="Black"
+                    WidthRequest="100" />
+
+                <Button
+                    BackgroundColor="{x:Static program:MauiProgram.ThemeColor}"
+                    Clicked="Button_Submit"
+                    Text="Submit"
+                    TextColor="White"
+                    WidthRequest="100" />
+            </HorizontalStackLayout>
+        </Grid>
+    </Border>
+</toolkit:Popup>

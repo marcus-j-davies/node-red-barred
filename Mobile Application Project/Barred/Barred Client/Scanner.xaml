@@ -11,6 +11,13 @@
         <toolkit:StatusBarBehavior StatusBarColor="{x:Static program:MauiProgram.ThemeColor}" StatusBarStyle="LightContent" />
     </ContentPage.Behaviors>
 
+    <ContentPage.Resources>
+        <program:MenuOption
+            action="DEFAULT"
+            scan="False"
+            x:Key="MenuCtx" />
+    </ContentPage.Resources>
+
     <Grid
         Margin="0,5,0,0"
         Padding="30"
@@ -65,15 +72,24 @@
                     Offset="5,5"
                     Opacity="0.8" />
             </Border.Shadow>
-            <scanner:CameraView
-                BarcodeSymbologies="All"
-                CameraEnabled="True"
-                HeightRequest="150"
-                OnDetectionFinished="ScannerEl_OnOnDetectionFinished"
-                TapToFocusEnabled="True"
-                ViewfinderMode="True"
-                WidthRequest="350"
-                x:Name="ScannerEl" />
+            <Grid HeightRequest="150" WidthRequest="350">
+                <scanner:CameraView
+                    BarcodeSymbologies="All"
+                    CameraEnabled="True"
+                    HeightRequest="150"
+                    OnDetectionFinished="ScannerEl_OnOnDetectionFinished"
+                    TapToFocusEnabled="True"
+                    ViewfinderMode="True"
+                    WidthRequest="350"
+                    x:Name="ScannerEl" />
+                <BoxView
+                    BackgroundColor="Red"
+                    HeightRequest="5"
+                    HorizontalOptions="Fill"
+                    Opacity="0.3"
+                    VerticalOptions="Center" />
+            </Grid>
+
         </Border>
 
         <Border
@@ -114,13 +130,27 @@
             ColumnDefinitions="Auto,*,Auto"
             ColumnSpacing="15"
             Grid.Row="4">
-            <Button
-                BackgroundColor="{x:Static program:MauiProgram.ThemeColor}"
-                Clicked="Button_OnClicked"
-                FontSize="20"
+            <StackLayout
                 Grid.Column="0"
                 HorizontalOptions="Center"
-                Text="Delete En" />
+                Orientation="Horizontal"
+                Spacing="6">
+                <Button
+                    BackgroundColor="Red"
+                    Clicked="Button_Delete"
+                    FontSize="20"
+                    Text="D" />
+                <Button
+                    BackgroundColor="{x:Static program:MauiProgram.ThemeColor}"
+                    BindingContext="{StaticResource MenuCtx}"
+                    Clicked="Button_Menu"
+                    FontSize="20"
+                    Text="M" />
+
+
+            </StackLayout>
+
+
             <Label
                 Grid.Column="1"
                 HorizontalOptions="Center"

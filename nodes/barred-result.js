@@ -8,7 +8,15 @@ module.exports = function (RED) {
 		self.on('input', (msg, send, done) => {
 			if (msg._barredCB) {
 				if (msg._barredCB.expires > new Date().getTime()) {
+					if (msg.status === 'MENU') {
+						Object.values(msg.payload).forEach((MI) => {
+							if (MI.context) {
+								MI.contextType = typeof MI.context;
+							}
+						});
+					}
 					msg._barredCB.callback({
+						title: msg.topic,
 						status: msg.status || config.defaultStatus,
 						payload: msg.payload,
 						payloadType: typeof msg.payload

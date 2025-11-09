@@ -9,7 +9,9 @@ module.exports = function (RED) {
 		const connectedScanners = {};
 		const barcodeEmitters = {};
 		const itemEmitters = {};
+		const actionEmitters = {};
 
+		// Barcodes
 		self.registerBarcodeEmitter = (id, fn) => {
 			barcodeEmitters[id] = fn;
 		};
@@ -18,12 +20,22 @@ module.exports = function (RED) {
 			delete barcodeEmitters[id];
 		};
 
+		// Items
 		self.registerItemEmitter = (id, fn) => {
 			itemEmitters[id] = fn;
 		};
 
 		self.unregisterItemEmitter = (id) => {
 			delete itemEmitters[id];
+		};
+
+		// Actions
+		self.registerActionEmitter = (id, fn) => {
+			actionEmitters[id] = fn;
+		};
+
+		self.unregisterActionEmitter = (id) => {
+			delete actionEmitters[id];
 		};
 
 		self.sendToScanner = (id, payload) => {
@@ -34,11 +46,11 @@ module.exports = function (RED) {
 
 			if (id) {
 				if (connectedScanners[id]) {
-					connectedScanners[id].emit('BARRED.Prompt', PL);
+					connectedScanners[id].emit('BARRED.Item', PL);
 				}
 			} else {
 				Object.values(connectedScanners).forEach((S) => {
-					S.emit('BARRED.Prompt', PL);
+					S.emit('BARRED.Item', PL);
 				});
 			}
 		};
@@ -62,8 +74,12 @@ module.exports = function (RED) {
 		self.io.on('connection', (scanner) => {
 			connectedScanners[scanner.handshake.auth.id] = scanner;
 
-			scanner.on('BARRED.Item', (args) => {
+			scanner.on('BARRED.Item', (args, callback) => {
 				const msg = {
+					_barredCB: {
+						expires: new Date().getTime() + parseInt(config.rtimeout),
+						callback: callback
+					},
 					payload: {
 						timestamp: args.timestamp,
 						item: { ...args.item },
@@ -88,6 +104,23 @@ module.exports = function (RED) {
 				};
 
 				Object.values(barcodeEmitters).forEach((emitter) => emitter(msg));
+			});
+
+			scanner.on('BARRED.Action', (args, callback) => {
+				const msg = {
+					_barredCB: {
+						expires: new Date().getTime() + parseInt(config.rtimeout),
+						callback: callback
+					},
+					payload: {
+						timestamp: args.timestamp,
+						action: { ...args.action },
+						barcode: args.barcode ? { ...args.barcode } : undefined,
+						scanner: { ...args.scanner }
+					}
+				};
+
+				Object.values(actionEmitters).forEach((emitter) => emitter(msg));
 			});
 
 			scanner.on('disconnect', () => {

@@ -1,84 +1,69 @@
 # Node RED BARRED
-The Node RED Barcode Processing Platform
+The Node RED Barcode Processing Platform!
 
-## Say what!?
-Node RED BARRED, is a Barcode Processing toolkit, with no bias towards any specific target.  
-This toolkit includes 2 main components
+Node RED BARRED is a complete, unbiased Barcode Processing Toolkit, allowing full control of the processes following a scan.
 
-- The set of Node RED Nodes 
-  - `Incoming Barcode`
-  - `Send Result`
-  - `Incoming Item`
-  - `Send Item`
+This Toolkit is in 2 parts:
 
-- A native Mobile Client, that does the scanning, the mobile application is developed in .NET MAUI.  
-  The barcode decoding is `on-device`, so the performance is only limited by the mobile platform. 
+- A Native Mobile Client (iOS, Android)
+- The set of Node RED Nodes
+
+The mobile application uses `on-device` barcode detection, so performance is much greater than web-based barcode scanners. 
 
 Currently, the supported barcode symbologies are:
 
- - iOS
-   - **1D**: Codabar, Code 39, Code 93, Code 128, EAN-8, EAN-13, GS1 DataBar, ITF, UPC-A, UPC-E;
-   - **2D**: Aztec, Data Matrix, MicroPDF417, MicroQR, PDF417, QR Code
+- iOS
+  - **1D**: Codabar, Code 39, Code 93, Code 128, EAN-8, EAN-13, GS1 DataBar, ITF, UPC-A, UPC-E
+  - **2D**: Aztec, Data Matrix, MicroPDF417, MicroQR, PDF417, QR Code
 
 - Android
-   - **1D**: Codabar, Code 39, Code 93, Code 128, EAN-8, EAN-13, ITF, UPC-A, UPC-E;
-   - **2D**: Aztec, Data Matrix, PDF417, QR Code
-     
+  - **1D**: Codabar, Code 39, Code 93, Code 128, EAN-8, EAN-13, ITF, UPC-A, UPC-E
+  - **2D**: Aztec, Data Matrix, PDF417, QR Code
 
-## Native App Build Environment
+The set of Nodes for Node RED opens up various processing requirements and, used together, offers massive flexibility in interoperability with other systems and processes. Furthermore, the Module allows for a menu system, adding full customization of the system.
 
- - Android DK 15 (35)
- - Java DK 25
- - DOTNET 9.0 (With Maui payloads)
- - xCode 16.4
- - Rider 2025.2.3
- - MacOS 26
+| Node | Description |
+|------|-----------------|
+| `Incoming Barcode` | Receives scanned barcodes |
+| `Send Result` | Response to the scanner that sent the barcode |
+| `Incoming Item` | Receives information responses |
+| `Send Item` | Sends information to the connected scanners |
+| `Incoming Action` | Receives menu requests |
 
-## The Usage Flow
+In effect, this Module (along with the Native Mobile application – which is Free & Open Source) brings you a Handheld Barcode Scanning Terminal.
 
-![Image](./Images/flow.png)
+There is a complete flow example included with this Node RED module, but detailing how it all fits together in text is difficult, so a video walkthrough of this platform is provided below.
 
-## Send Item Node
+[![Watch the video](./Help/Snap.png)](https://github.com/marcus-j-davies/node-red-barred/raw/refs/heads/v1.1.0/Help/Walkthrough.mov?download=)
 
-The `Send Item` Node allows you to send a message or object - without the need for a scanner to first present a scan, this for example, can allow you to notify scanners at any point, it can send a message to 1 or many scanners, or maybe you want to return something back to the scanner, that provided some info, following its initial scan.  
+# Native App Build Environment
 
-![Image](./Images/Send.png)
+- Android SDK 15 (35)
+- Java SDK 25
+- DOTNET 9.0 (with MAUI payloads)
+- Xcode 16.4
+- Rider 2025.2.3
+- macOS 26
 
-Thats the point here - use the tookit in a way that works for you - And yes, it suppports emojis in a message.
+The complete set of elements to get up and running is [here](./Complete%20Dist/):
 
-![Image](./Images/Emoji.png)
+- Android APK
+- iOS IPA (Unsigned)
+- Node RED Module (can also be installed via standard methods) 
 
+## To Do
 
+- Allow rich content in responses/items
+- Add dropdown (select) to allowed list of input types for information requests
+- Add SSL support
+- Allow for deeper object formatting  
+  Currently, nested objects on the scanners are not formatted
 
-## Built in Flow example
-
-The Node collection, includes an example Node RED flow - Just modify the Config to suite and Deploy.
-
-## Scanner Enrollment / Branding
-
-The scanner UI, can be controlled by the Configuration Node.
-
- - Department Name
- - UI Icon
- - Color Theme
- - Scanner name (per Scanner)
- - Scan Rates & timeouts
-
- You enrol scanners via a QR Code - which is generated via the Configuration Node.  
-
-## To do
-
- - Allow rich content in responses / items.
- - Add dropdown (select) to allowed list of input types for info  request
- - Add SSL Support
- - Allow for deeper Object formatting.  
-   Currently nested objects on the scanner, are not formatted  
 
 ## Acknowledgements
 
-[Dynamic Dave - Node RED Community member](https://discourse.nodered.org/u/dynamicdave/summary) - For helping me test  
+Node RED Community members [Dynamic Dave](https://discourse.nodered.org/u/dynamicdave/summary) & [Zen Of Mud](https://discourse.nodered.org/u/Zenofmud/summary) - For helping me test out the platform  
 [Afriscic](https://github.com/afriscic) - For the Native Barcode Decoding lib
-
 
 
 ## License

@@ -12,9 +12,9 @@ namespace Barred_Client;
 
 public partial class Enrol : ContentPage
 {
-    private static IAudioManager AM;
-    private static IAudioPlayer AM_OK;
-    private static IAudioPlayer AM_ERROR;
+    private IAudioManager AM;
+    private IAudioPlayer AM_OK;
+    private IAudioPlayer AM_ERROR;
     
     public Enrol(IAudioManager AudioManager)
     {

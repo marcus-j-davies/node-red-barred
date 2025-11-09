@@ -1,0 +1,29 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Barred_Client;
+
+public partial class Information : CommunityToolkit.Maui.Views.Popup
+{
+    public VerticalStackLayout _ContentPH;
+    public Information()
+    {
+        InitializeComponent();
+        _ContentPH = ContentPH;
+    }
+
+    private void Button_Submit(object? sender, EventArgs e)
+    {
+        Close(true);
+    }
+
+    private void Button_Cancel(object? sender, EventArgs e)
+    {
+        Close(false);
+    }
+}
+
+

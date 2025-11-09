@@ -7,7 +7,7 @@ namespace Barred_Client;
 
 public static class MauiProgram
 {
-    public static readonly string _RequiredStackVersion = "^1.0.0";
+    public static readonly string _RequiredStackVersion = "^1.1.0";
     public static Invitiation _Enrollment;
 
     public static Color ThemeColor => Color.FromArgb(_Enrollment.Theme.Color);

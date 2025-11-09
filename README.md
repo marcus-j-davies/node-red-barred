@@ -34,6 +34,8 @@ In affect - this Module (along with the Native Mobile applcation - Which is Free
 
 There is a complete flow example included with this Node RED module, but detaling how it all fits toiegther in text, is difficult, so I provide a video walk through of this platform below.
 
+[![Walkthrough](./Help/Snap.png)](./Help/Walkthrough.mov)
+
 # Native App Build Environment
 
  - Android DK 15 (35)

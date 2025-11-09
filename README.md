@@ -1,69 +1,68 @@
 # Node RED BARRED
 The Node RED Barcode Processing Platform!
 
-Node RED BARRED, is complete unbiased Barcode Processing Toolkit, allowing full control of the processes following a scan.
+Node RED BARRED is a complete, unbiased Barcode Processing Toolkit, allowing full control of the processes following a scan.
 
-Ths Toolkit is in 2 parts.
+This Toolkit is in 2 parts:
 
- - A Native Mobile Client (iOS, Android)
- - The set of Node RED Nodes.
+- A Native Mobile Client (iOS, Android)
+- The set of Node RED Nodes
 
-The mobile application uses `on-device` barcode detection, so performance is much greater than web based barcode scanners. 
+The mobile application uses `on-device` barcode detection, so performance is much greater than web-based barcode scanners. 
 
 Currently, the supported barcode symbologies are:
 
- - iOS
-   - **1D**: Codabar, Code 39, Code 93, Code 128, EAN-8, EAN-13, GS1 DataBar, ITF, UPC-A, UPC-E;
-   - **2D**: Aztec, Data Matrix, MicroPDF417, MicroQR, PDF417, QR Code
+- iOS
+  - **1D**: Codabar, Code 39, Code 93, Code 128, EAN-8, EAN-13, GS1 DataBar, ITF, UPC-A, UPC-E
+  - **2D**: Aztec, Data Matrix, MicroPDF417, MicroQR, PDF417, QR Code
 
 - Android
-   - **1D**: Codabar, Code 39, Code 93, Code 128, EAN-8, EAN-13, ITF, UPC-A, UPC-E;
-   - **2D**: Aztec, Data Matrix, PDF417, QR Code
+  - **1D**: Codabar, Code 39, Code 93, Code 128, EAN-8, EAN-13, ITF, UPC-A, UPC-E
+  - **2D**: Aztec, Data Matrix, PDF417, QR Code
 
-The set of Nodes for Node RED, open up various processing requreiments, and used together - offers massive felxibility in interoperability with other systems/processes - furthermore, the Module allows for a menu system, adding full customsiation of the system.
+The set of Nodes for Node RED opens up various processing requirements and, used together, offers massive flexibility in interoperability with other systems and processes. Furthermore, the Module allows for a menu system, adding full customization of the system.
 
 | Node | Description |
 |------|-----------------|
-| `Incoming Barcode` | Recieves scanned barcodes  |
-| `Send Result` | Respons to the scanner, that sent the barcode  |
-| `Incoming Item` | Recieves information requests  |
-| `Send Item` | Send information to the connected scanners  |
-| `Incoming Action` | Recieves menu requests |
+| `Incoming Barcode` | Receives scanned barcodes |
+| `Send Result` | Response to the scanner that sent the barcode |
+| `Incoming Item` | Receives information responses |
+| `Send Item` | Sends information to the connected scanners |
+| `Incoming Action` | Receives menu requests |
 
-In affect - this Module (along with the Native Mobile applcation - Which is Free & Open Source) brings you a Handheld Barcode Scanning Terminal
+In effect, this Module (along with the Native Mobile application – which is Free & Open Source) brings you a Handheld Barcode Scanning Terminal.
 
-There is a complete flow example included with this Node RED module, but detaling how it all fits toiegther in text, is difficult, so I provide a video walk through of this platform below.
+There is a complete flow example included with this Node RED module, but detailing how it all fits together in text is difficult, so a video walkthrough of this platform is provided below.
 
 [![Watch the video](./Help/Snap.png)](https://github.com/marcus-j-davies/node-red-barred/raw/refs/heads/v1.1.0/Help/Walkthrough.mov?download=)
 
-
-
 # Native App Build Environment
 
- - Android DK 15 (35)
- - Java DK 25
- - DOTNET 9.0 (With Maui payloads)
- - xCode 16.4
- - Rider 2025.2.3
- - MacOS 26
+- Android SDK 15 (35)
+- Java SDK 25
+- DOTNET 9.0 (with MAUI payloads)
+- Xcode 16.4
+- Rider 2025.2.3
+- macOS 26
 
- The complete set of elements to get up and running  are [here](./Complete%20Dist/)
+The complete set of elements to get up and running is [here](./Complete%20Dist/):
 
-  - Android APK
-  - iOS IPA (Unsigned)
-  - Node RED Module (but this can also be installed via the standard methods) 
+- Android APK
+- iOS IPA (Unsigned)
+- Node RED Module (can also be installed via standard methods) 
 
-## To do
+## To Do
 
- - Allow rich content in responses / items.
- - Add dropdown (select) to allowed list of input types for info  request
- - Add SSL Support
- - Allow for deeper Object formatting.  
-   Currently nested objects on the scanner, are not formatted  
+- Allow rich content in responses/items
+- Add dropdown (select) to allowed list of input types for information requests
+- Add SSL support
+- Allow for deeper object formatting  
+  Currently, nested objects on the scanners are not formatted
+
 
 ## Acknowledgements
 
-[Dynamic Dave - Node RED Community member](https://discourse.nodered.org/u/dynamicdave/summary) - For helping me test  
+Node RED Community members [Dynamic Dave](https://discourse.nodered.org/u/dynamicdave/summary) & [Zen Of Mud](https://discourse.nodered.org/u/Zenofmud/summary) - For helping me test out the platform  
 [Afriscic](https://github.com/afriscic) - For the Native Barcode Decoding lib
 
 

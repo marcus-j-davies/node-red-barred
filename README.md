@@ -34,7 +34,7 @@ In affect - this Module (along with the Native Mobile applcation - Which is Free
 
 There is a complete flow example included with this Node RED module, but detaling how it all fits toiegther in text, is difficult, so I provide a video walk through of this platform below.
 
-<video src='./Help/Walkthrough.mov' width=720/>
+<video src="./Help/Walkthrough.mov" width="720"/>
 
 # Native App Build Environment
 

@@ -34,7 +34,7 @@ In effect, this Module (along with the Native Mobile application – which is Fr
 
 There is a complete flow example included with this Node RED module, but detailing how it all fits together in text is difficult, so a video walkthrough of this platform is provided below.
 
-[![Watch the video](./Help/Snap.png)](https://github.com/marcus-j-davies/node-red-barred/raw/refs/heads/v1.1.0/Help/Walkthrough.mov?download=)
+[![Watch the video](./Help/Snap.png)](https://github.com/marcus-j-davies/node-red-barred/raw/refs/heads/main/Help/Walkthrough.mov?download=)
 
 # Native App Build Environment
 

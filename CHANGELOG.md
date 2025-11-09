@@ -1,3 +1,7 @@
+**v1.1.2**
+ - Fixes
+   - Typos
+
 **v1.1.1**
  - Fixes
    - Correct Read Me Links

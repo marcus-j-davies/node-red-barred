@@ -47,7 +47,7 @@ There is a complete flow example included with this Node RED module, but detaili
 The complete set of elements to get up and running is [here](https://github.com/marcus-j-davies/node-red-barred/tree/main/Complete%20Dist):
 
 ⚠️ **WARNING**  If you did not obtain the APK/IPA from this repository, ensure you trust the source.  
-To be safe - alway pulled the Mobiklr applciations form this repo only
+To be safe - always pull the Mobile Applications from [this](https://github.com/marcus-j-davies/node-red-barred) repo only (marcus-j-davies/node-red-barred)
 
 - Android APK
 - iOS IPA (Unsigned)

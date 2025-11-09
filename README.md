@@ -37,7 +37,6 @@ There is a complete flow example included with this Node RED module, but detaili
 [![Watch the video](./Help/Snap.png)](https://github.com/marcus-j-davies/node-red-barred/raw/refs/heads/main/Help/Walkthrough.mov?download=)
 
 # Native App Build Environment
-
 - Android SDK 15 (35)
 - Java SDK 25
 - DOTNET 9.0 (with MAUI payloads)
@@ -45,13 +44,16 @@ There is a complete flow example included with this Node RED module, but detaili
 - Rider 2025.2.3
 - macOS 26
 
-The complete set of elements to get up and running is [here](./Complete%20Dist/):
+The complete set of elements to get up and running is [here](https://github.com/marcus-j-davies/node-red-barred/tree/main/Complete%20Dist):
+
+⚠️ **WARNING**  If you did not obtain the APK/IPA from this repository, ensure you trust the source.  
+To be safe - alway pulled the Mobiklr applciations form this repo only
 
 - Android APK
 - iOS IPA (Unsigned)
 - Node RED Module (can also be installed via standard methods) 
 
-## To Do
+# To Do
 
 - Allow rich content in responses/items
 - Add dropdown (select) to allowed list of input types for information requests
@@ -60,13 +62,13 @@ The complete set of elements to get up and running is [here](./Complete%20Dist/)
   Currently, nested objects on the scanners are not formatted
 
 
-## Acknowledgements
+# Acknowledgements
 
 Node RED Community members [Dynamic Dave](https://discourse.nodered.org/u/dynamicdave/summary) & [Zen Of Mud](https://discourse.nodered.org/u/Zenofmud/summary) - For helping me test out the platform  
 [Afriscic](https://github.com/afriscic) - For the Native Barcode Decoding lib
 
 
-## License
+# License
 MIT License
 
 Copyright (c) 2025 Marcus Davies

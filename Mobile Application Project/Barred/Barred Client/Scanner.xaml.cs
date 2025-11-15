@@ -297,12 +297,18 @@ public partial class Scanner : ContentPage
         string Status = Res.status;
         string PayloadType = Res.payloadType;
         string Title = Res.title;
+        Uri Attachment = Res.attachment;
         object Payload = Res.payload;
 
         if (Status == "ERROR") PlayAudio(AM_ERROR);
         else if (Status == "OK") PlayAudio(AM_OK);
         else if (Status == "INFO") PlayAudio(AM_PROMPT);
         else if (Status == "MENU") PlayAudio(AM_PROMPT);
+
+        if (Status == "OK" && Attachment != null)
+        {
+            // thinking on how to show the image button
+        }
 
         if (Status == "INFO")
         {

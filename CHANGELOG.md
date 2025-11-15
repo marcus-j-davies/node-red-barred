@@ -1,3 +1,7 @@
+**v1.2.0**
+ - New Features
+   - Allow image URL attachments to `OK` responses
+
 **v1.1.2**
  - Fixes
    - Typos

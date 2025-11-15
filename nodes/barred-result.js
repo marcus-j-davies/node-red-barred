@@ -19,6 +19,7 @@ module.exports = function (RED) {
 						title: msg.topic,
 						status: msg.status || config.defaultStatus,
 						payload: msg.payload,
+						attachment: msg.status === 'OK' && msg.attachment ? msg.attachment : undefined,
 						payloadType: typeof msg.payload
 					});
 				} else {

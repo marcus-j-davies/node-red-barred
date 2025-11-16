@@ -5,8 +5,8 @@
     not a whole HTML document (including the `body` tag).  
     This allows for much richer content.
 
-   - if sending html, a vlaue of `{{BARRED.themecolor}}`  
-    will get replaced with the confirgations color setting.
+   - if sending html, a vlaue of `{{BARRED.themeColor}}`  
+    will get replaced with the configurations color setting.
 
    - `INFO` responses, can now support dropdowns.  
       Todo this simply send a property with an array.  

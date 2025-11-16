@@ -76,7 +76,7 @@ public partial class Scanner : ContentPage
             {
                 WebView W = new WebView();
                 string HTMLs  = Obj.ToString();
-                HTMLs = HTMLs.Replace("{{BARRED.themecolor}}", MauiProgram._Enrollment.Theme.Color);
+                HTMLs = HTMLs.Replace("{{BARRED.themeColor}}", MauiProgram._Enrollment.Theme.Color);
                 FileSystem.OpenAppPackageFileAsync("HTMLTemplate.html").ContinueWith((R) =>
                 {
                     using (StreamReader reader = new StreamReader(R.Result))
@@ -108,7 +108,7 @@ public partial class Scanner : ContentPage
                     Text = "\n--------------------------\n\n"
                 });
                 
-                if (typeof(string) == Obj.GetType())
+                if (Obj is string)
                 {
                     L.FormattedText.Spans.Add(new Span
                     {

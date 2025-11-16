@@ -212,6 +212,7 @@ public partial class Scanner : ContentPage
             case "string":
             case "number":
                 Entry En = new Entry();
+                
                 En.BindingContext = key;
                 En.BackgroundColor = Colors.LightGrey;
                 En.PlaceholderColor = Colors.Gray;
@@ -237,6 +238,16 @@ public partial class Scanner : ContentPage
                 Tm.BindingContext = key;
                 Tm.BackgroundColor = Colors.LightGrey;
                 return Tm;
+            
+            case "object":
+                Picker picker = new Picker();
+                picker.BindingContext = key;
+                picker.BackgroundColor = Colors.LightGrey;
+                foreach (string i in Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(value.ToString()))
+                {
+                    picker.Items.Add(i);
+                }
+                return picker;
             
             default:
                 Entry De = new Entry();

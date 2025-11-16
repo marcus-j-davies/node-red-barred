@@ -4,10 +4,7 @@ using Plugin.Maui.Audio;
 using SocketIOClient;
 using CommunityToolkit.Maui.Views;
 
-
 namespace Barred_Client;
-
-
 
 public partial class Scanner : ContentPage
 {
@@ -24,7 +21,6 @@ public partial class Scanner : ContentPage
         AM = AudioManager;
         SetupAudio();
         SetupConnection();
- 
     }
     
     protected override void OnDisappearing()
@@ -75,6 +71,7 @@ public partial class Scanner : ContentPage
             if (Obj is string && isHTML)
             {
                 WebView W = new WebView();
+                W.BackgroundColor = Colors.LightGray;
                 string HTMLs  = Obj.ToString();
                 HTMLs = HTMLs.Replace("{{BARRED.themeColor}}", MauiProgram._Enrollment.Theme.Color);
                 FileSystem.OpenAppPackageFileAsync("HTMLTemplate.html").ContinueWith((R) =>
@@ -251,7 +248,7 @@ public partial class Scanner : ContentPage
             
             default:
                 Entry De = new Entry();
-                De.IsVisible = key.StartsWith("_");
+                De.IsVisible = !key.StartsWith("_");
                 De.IsReadOnly = true;
                 De.Text = value.ToString();
                 De.BindingContext = key;
@@ -275,6 +272,7 @@ public partial class Scanner : ContentPage
                 
                 Label L = new Label();
                 L.Text = key;
+                L.IsVisible = !key.StartsWith("_");
 
                 I._ContentPH.Add(new VerticalStackLayout
                 {

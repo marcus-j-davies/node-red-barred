@@ -24,6 +24,7 @@ public partial class Scanner : ContentPage
         AM = AudioManager;
         SetupAudio();
         SetupConnection();
+ 
     }
     
     protected override void OnDisappearing()
@@ -38,6 +39,15 @@ public partial class Scanner : ContentPage
 
     private async void SetupAudio()
     {
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            AudioSwitch.IsToggled = Microsoft.Maui.Storage.Preferences.Get("Audio",true);
+            AudioSwitch.Toggled += (sender, args) =>
+            {
+                Microsoft.Maui.Storage.Preferences.Set("Audio", args.Value);
+            };
+        });
+        
         AM_OK = AM.CreatePlayer(await FileSystem.OpenAppPackageFileAsync("OK.mp3"));
         AM_ERROR = AM.CreatePlayer(await FileSystem.OpenAppPackageFileAsync("ERROR.mp3"));
         AM_PROMPT = AM.CreatePlayer(await FileSystem.OpenAppPackageFileAsync("PROMPT.mp3"));
@@ -507,6 +517,7 @@ public partial class Scanner : ContentPage
         if (Yes)
         {
             Microsoft.Maui.Storage.Preferences.Remove("Enrollment");
+            Microsoft.Maui.Storage.Preferences.Remove("Audio");
             await Shell.Current.Navigation.PopToRootAsync();
         }
     }

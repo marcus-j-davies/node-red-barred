@@ -8,7 +8,7 @@
    - if sending html, a vlaue of `{{BARRED.themeColor}}`  
     will get replaced with the configurations color setting.
 
-   - `INFO` responses, can now support dropdowns.  
+   - `INFO` requests, can now support dropdowns.  
       Todo this simply send a property with an array.  
       ```js
       msg.status = 'INFO'
@@ -19,6 +19,9 @@
         PlaceOfPurchase: ['Best Buy', 'Micro Center', 'Lowes', 'Amazon']
       }
       ```
+
+    - Any property as part of an `INFO` request that start with an underscore (`_`)  
+    are hidden from the user, you will use this to provide a fixed/hidden value.
 
   - **Changes**
     - The audio feedback swtich state is now restored, when relaunching the app

@@ -251,6 +251,7 @@ public partial class Scanner : ContentPage
             
             default:
                 Entry De = new Entry();
+                De.IsVisible = key.StartsWith("_");
                 De.IsReadOnly = true;
                 De.Text = value.ToString();
                 De.BindingContext = key;
@@ -293,6 +294,7 @@ public partial class Scanner : ContentPage
             List<Editor> editors = I._ContentPH.GetDescendantsOfType<Editor>().ToList();
             List<DatePicker> datePickers = I._ContentPH.GetDescendantsOfType<DatePicker>().ToList();
             List<TimePicker> timePickers = I._ContentPH.GetDescendantsOfType<TimePicker>().ToList();
+            List<Picker> pickers = I._ContentPH.GetDescendantsOfType<Picker>().ToList();
 
             Dictionary<string, object> itemPayload = new Dictionary<string, object>();
             long unixTimeMillis = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -329,6 +331,11 @@ public partial class Scanner : ContentPage
             foreach (TimePicker tm in timePickers)
             {
                 if (tm.BindingContext != null) item.Add(tm.BindingContext.ToString(),tm.Time.ToString());
+            }
+            
+            foreach (Picker p in pickers)
+            {
+                if (p.BindingContext != null) item.Add(p.BindingContext.ToString(),p.SelectedItem.ToString());
             }
 
             itemPayload.Add("item", item);

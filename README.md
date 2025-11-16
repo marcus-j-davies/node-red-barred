@@ -55,8 +55,6 @@ To be safe - always pull the Mobile Applications from [this](https://github.com/
 
 # To Do
 
-- Allow rich content in responses/items
-- Add dropdown (select) to allowed list of input types for information requests
 - Add SSL support
 - Allow for deeper object formatting  
   Currently, nested objects on the scanners are not formatted

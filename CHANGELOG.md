@@ -15,7 +15,7 @@
       msg.payload = {
         Item: 'string',
         Cost: 'number',
-        Date: 'date'
+        Date: 'date',
         PlaceofPurchase: ['Best Buy', 'Micro Center', 'Lowes', 'Amazon']
       }
       ```

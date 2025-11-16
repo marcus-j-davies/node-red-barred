@@ -56,50 +56,80 @@ public partial class Scanner : ContentPage
         MainThread.BeginInvokeOnMainThread(() => { ScannerEl.CameraEnabled = enable; });
     }
 
-    private void RenderPayload(object Obj)
+    private void RenderPayload(object Obj, bool isHTML = false)
     {
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            Status.FormattedText.Spans.Clear();
-            Status.FormattedText.Spans.Add(new Span
+            ContentPlacholder.Content = null;
+            
+            if (Obj is string && isHTML)
             {
-                FontAttributes = FontAttributes.Bold,
-                Text = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss")
-            });
-            Status.FormattedText.Spans.Add(new Span
-            {
-                Text = "\n--------------------------\n\n"
-            });
-
-            if (typeof(string) == Obj.GetType())
-            {
-                Status.FormattedText.Spans.Add(new Span
+                WebView W = new WebView();
+                string HTMLs  = Obj.ToString();
+                HTMLs = HTMLs.Replace("{{BARRED.themecolor}}", MauiProgram._Enrollment.Theme.Color);
+                FileSystem.OpenAppPackageFileAsync("HTMLTemplate.html").ContinueWith((R) =>
                 {
-                    Text = Obj.ToString()
+                    using (StreamReader reader = new StreamReader(R.Result))
+                    {
+                        string htmlText = reader.ReadToEnd();
+                        W.Source = new HtmlWebViewSource
+                        {
+                            Html = htmlText.Replace("{{HTML}}",HTMLs)
+                        };
+                    }
                 });
+
+                ContentPlacholder.Content = W;
             }
             else
             {
-                Dictionary<string, object> Props = (Dictionary<string, object>)Obj;
-                int Pad = Props.Keys.Max((K) => K.Length) + 2;
-                foreach (string KEY in Props.Keys)
+                Label L = new Label();
+                L.FontSize = 16;
+                L.LineBreakMode = LineBreakMode.WordWrap;
+                L.FormattedText = new FormattedString();
+                
+                L.FormattedText.Spans.Add(new Span
                 {
-                    Status.FormattedText.Spans.Add(new Span
+                    FontAttributes = FontAttributes.Bold,
+                    Text = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss")
+                });
+                L.FormattedText.Spans.Add(new Span
+                {
+                    Text = "\n--------------------------\n\n"
+                });
+                
+                if (typeof(string) == Obj.GetType())
+                {
+                    L.FormattedText.Spans.Add(new Span
                     {
-                        FontFamily = "Courier New",
-                        FontAttributes = FontAttributes.Bold,
-                        Text = $"{KEY}: ".PadRight(Pad, ' ')
-                    });
-                    Status.FormattedText.Spans.Add(new Span
-                    {
-                        FontFamily = "Courier New",
-                        Text = Props[KEY].ToString()
-                    });
-                    Status.FormattedText.Spans.Add(new Span
-                    {
-                        Text = "\n"
+                        Text = Obj.ToString()
                     });
                 }
+                else
+                {
+                    Dictionary<string, object> Props = (Dictionary<string, object>)Obj;
+                    int Pad = Props.Keys.Max((K) => K.Length) + 2;
+                    foreach (string KEY in Props.Keys)
+                    {
+                        L.FormattedText.Spans.Add(new Span
+                        {
+                            FontFamily = "Courier New",
+                            FontAttributes = FontAttributes.Bold,
+                            Text = $"{KEY}: ".PadRight(Pad, ' ')
+                        });
+                        L.FormattedText.Spans.Add(new Span
+                        {
+                            FontFamily = "Courier New",
+                            Text = Props[KEY].ToString()
+                        });
+                        L.FormattedText.Spans.Add(new Span
+                        {
+                            Text = "\n"
+                        });
+                    }
+                }
+
+                ContentPlacholder.Content = L;
             }
         });
     }
@@ -159,7 +189,7 @@ public partial class Scanner : ContentPage
                     break;
             }
 
-            RenderPayload(I.payload);
+            RenderPayload(I.payload, I.isHTML);
         });
 
         await SOK.ConnectAsync(CancellationToken.None);
@@ -297,19 +327,14 @@ public partial class Scanner : ContentPage
         string Status = Res.status;
         string PayloadType = Res.payloadType;
         string Title = Res.title;
-        Uri Attachment = Res.attachment;
         object Payload = Res.payload;
+        bool isHTML = Res.isHTML;
 
         if (Status == "ERROR") PlayAudio(AM_ERROR);
         else if (Status == "OK") PlayAudio(AM_OK);
         else if (Status == "INFO") PlayAudio(AM_PROMPT);
         else if (Status == "MENU") PlayAudio(AM_PROMPT);
-
-        if (Status == "OK" && Attachment != null)
-        {
-            // thinking on how to show the image button
-        }
-
+        
         if (Status == "INFO")
         {
             Dictionary<string, object> Layout = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(Payload.ToString());
@@ -357,7 +382,7 @@ public partial class Scanner : ContentPage
                     break;
             }
 
-            RenderPayload(Payload);
+            RenderPayload(Payload, isHTML);
         }
     }
 

@@ -7,7 +7,7 @@ module.exports = function (RED) {
 		self.stack = RED.nodes.getNode(self.config.stack);
 
 		self.on('input', (msg, send, done) => {
-			self.stack.sendToScanner(msg.topic, msg.payload);
+			self.stack.sendToScanner(msg.topic, msg.payload, msg.isHTML ?? false);
 			send(msg);
 			done();
 		});

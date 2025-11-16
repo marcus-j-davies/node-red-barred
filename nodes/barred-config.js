@@ -38,10 +38,11 @@ module.exports = function (RED) {
 			delete actionEmitters[id];
 		};
 
-		self.sendToScanner = (id, payload) => {
+		self.sendToScanner = (id, payload, HTML) => {
 			const PL = {
 				payloadType: typeof payload,
-				payload: payload
+				payload: payload,
+				isHTML: HTML
 			};
 
 			if (id) {

@@ -109,29 +109,16 @@
                     Opacity="0.8" />
             </Border.Shadow>
 
-            <Grid RowDefinitions="*,Auto">
 
-                <ScrollView
-                    BackgroundColor="LightGrey"
-                    HorizontalOptions="FillAndExpand"
-                    Padding="5"
-                    VerticalOptions="FillAndExpand">
-                    <Label
-                        FontSize="16"
-                        LineBreakMode="WordWrap"
-                        x:Name="Status">
-                        <Label.FormattedText>
-                            <FormattedString />
-                        </Label.FormattedText>
-                    </Label>
-                </ScrollView>
-                <Button
-                    Background="{x:Static program:MauiProgram.ThemeColor}"
-                    Grid.Row="1"
-                    HorizontalOptions="FillAndExpand"
-                    Margin="5"
-                    Text="View Attachment" />
-            </Grid>
+
+            <ScrollView
+                BackgroundColor="LightGrey"
+                HorizontalOptions="FillAndExpand"
+                Padding="5"
+                VerticalOptions="FillAndExpand"
+                x:Name="ContentPlacholder" />
+
+
         </Border>
 
         <Grid

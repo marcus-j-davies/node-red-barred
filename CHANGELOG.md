@@ -8,7 +8,7 @@
    - if sending html, a vlaue of `{{BARRED.themecolor}}`  
     will get replaced with the confirgations color setting.
 
-   - `INFO` responses, can not support drop downs.  
+   - `INFO` responses, can now support dropdowns.  
       Todo this simply send a property with an array.  
       ```js
       msg.status = 'INFO'
@@ -16,12 +16,12 @@
         Item: 'string',
         Cost: 'number',
         Date: 'date',
-        PlaceofPurchase: ['Best Buy', 'Micro Center', 'Lowes', 'Amazon']
+        PlaceOfPurchase: ['Best Buy', 'Micro Center', 'Lowes', 'Amazon']
       }
       ```
 
   - **Changes**
-    - The audio feedback swtich state is now resored, when relauncing the app
+    - The audio feedback swtich state is now restored, when relaunching the app
 
 **v1.1.2**
  - **Fixes**
